@@ -1,7 +1,7 @@
 package OOP_Project;
 
 class User{
-    protected String name,user_id,password;
+    protected String name, user_id, password;
 
     public User(){
         name = "";

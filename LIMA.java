@@ -6,6 +6,6 @@ import java.awt.event.*;
 
 public class LIMA{
     public static void main(String[] args){
-        GUI A = new GUI();
+        new GUI();
     }
 }
