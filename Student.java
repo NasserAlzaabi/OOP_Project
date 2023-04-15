@@ -7,7 +7,4 @@ public class Student extends User{
 		this.phone_Number = phone_Number;
 	}
 
-	
-
-
 }

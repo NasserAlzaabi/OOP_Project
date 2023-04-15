@@ -3,6 +3,9 @@ package OOP_Project;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 
 class GUI{
     private JFrame frame;
@@ -12,8 +15,8 @@ class GUI{
     private JButton loginButton,signupButton,returnButton,submitLogin,submitSignup;
     private JTextField userText;
     private JPasswordField passwordText;
-    //private Jlabel user, name, pass, number;
-    public GUI(){
+
+    public GUI() throws FileNotFoundException{
         //general JFrame structure setup
 
         frame = new JFrame("LIMA Project");
@@ -73,6 +76,8 @@ class GUI{
 
     
     private JTextField[] studentInfo;
+    PrintWriter out = new PrintWriter("studentInfo.txt");
+
     public void signUp(){
         studentInfo = new JTextField[4];
 		for (int i = 0; i < 4; i++) studentInfo[i] = new JTextField();
@@ -89,7 +94,8 @@ class GUI{
         signupPanel.add(studentInfo[2]);
         signupPanel.add(new JLabel("Phone number: "));
         signupPanel.add(studentInfo[3]);
-
+        out.println(studentInfo[0].getText() + studentInfo[1].getText() + studentInfo[2].getText() + studentInfo[3].getText());
+        out.close();
     }
     
     class loginHandler implements ActionListener{
