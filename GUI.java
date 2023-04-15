@@ -45,7 +45,6 @@ class GUI{
         frame.add(signupPanel, "SignupPanel");
         frame.setSize(400,250);
         frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
         
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -68,29 +67,28 @@ class GUI{
         loginPanel.add(submitLogin);
         loginPanel.add(returnButton);
 
-        
+        frame.setVisible(true);
         signUp();
     }
 
     
-    private JTextField studentInfo[];
+    private JTextField[] studentInfo;
     public void signUp(){
-        
-        signupPanel.setLayout(new GridLayout(4,4));
+        studentInfo = new JTextField[4];
+		for (int i = 0; i < 4; i++) studentInfo[i] = new JTextField();
 
-        //studentInfo[0] = new JTextField();
-        //studentInfo[1] = new JTextField();
-        //studentInfo[2] = new JTextField();
-        //studentInfo[3] = new JTextField();
+        signupPanel.setLayout(new GridLayout(4,4));
+		
+
 
         signupPanel.add(new JLabel("ID: "));
-        //signupPanel.add(studentInfo[0]);
+        signupPanel.add(studentInfo[0]);
         signupPanel.add(new JLabel("Name: "));
-        //signupPanel.add(studentInfo[1]);
+        signupPanel.add(studentInfo[1]);
         signupPanel.add(new JLabel("Password: "));
-        //signupPanel.add(studentInfo[2]);
+        signupPanel.add(studentInfo[2]);
         signupPanel.add(new JLabel("Phone number: "));
-        //signupPanel.add(studentInfo[3]);
+        signupPanel.add(studentInfo[3]);
 
     }
     
