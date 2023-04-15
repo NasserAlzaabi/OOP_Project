@@ -12,7 +12,7 @@ class GUI{
     private JButton loginButton,signupButton,returnButton,submitLogin,submitSignup;
     private JTextField userText;
     private JPasswordField passwordText;
-
+    //private Jlabel user, name, pass, number;
     public GUI(){
         //general JFrame structure setup
 
@@ -23,8 +23,8 @@ class GUI{
         cardLayout = new CardLayout();
 
         mainLabel = new JLabel("Login or Sign Up");
-        userLabel = new JLabel("Username: ");
-        passwordLabel = new JLabel("Password");
+        userLabel = new JLabel("Usesxdfrname: ");
+        passwordLabel = new JLabel("Password:");
 
         loginButton = new JButton("Login");
         loginButton.addActionListener(new loginHandler());
@@ -67,8 +67,33 @@ class GUI{
         loginPanel.add(passwordText);
         loginPanel.add(submitLogin);
         loginPanel.add(returnButton);
+
+        
+        signUp();
     }
 
+    
+    private JTextField studentInfo[];
+    public void signUp(){
+        
+        signupPanel.setLayout(new GridLayout(4,4));
+
+        //studentInfo[0] = new JTextField();
+        //studentInfo[1] = new JTextField();
+        //studentInfo[2] = new JTextField();
+        //studentInfo[3] = new JTextField();
+
+        signupPanel.add(new JLabel("ID: "));
+        //signupPanel.add(studentInfo[0]);
+        signupPanel.add(new JLabel("Name: "));
+        //signupPanel.add(studentInfo[1]);
+        signupPanel.add(new JLabel("Password: "));
+        //signupPanel.add(studentInfo[2]);
+        signupPanel.add(new JLabel("Phone number: "));
+        //signupPanel.add(studentInfo[3]);
+
+    }
+    
     class loginHandler implements ActionListener{
         public void actionPerformed(ActionEvent e){
             cardLayout.show(frame.getContentPane(), "LoginPanel");
