@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 
 public class GUI extends JFrame{
     private JFrame frame;
-    private JPanel mainPanel,loginPanel,signupPanel;
+    private JPanel mainPanel,loginPanel,signupPanel,testPanel;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,returnButton1,returnButton2,submitLogin,submitSignup,exitButton;
@@ -23,6 +23,7 @@ public class GUI extends JFrame{
         mainPanel = new JPanel();
         loginPanel = new JPanel();
         signupPanel = new JPanel();
+        testPanel = new JPanel();
         cardLayout = new CardLayout();
 
         loginButton = new JButton("Login");
@@ -48,6 +49,7 @@ public class GUI extends JFrame{
         frame.add(mainPanel,"MainPanel");
         frame.add(loginPanel,"LoginPanel");
         frame.add(signupPanel, "SignupPanel");
+        frame.add(testPanel, "testPanel");
         frame.setSize(400,250);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,6 +60,9 @@ public class GUI extends JFrame{
         mainP();
         logIn();
         signUp();
+
+        testPanel.setLayout(new GridLayout(3,4));
+        testPanel.add(new JLabel("login success"));
     }
 
     
@@ -123,6 +128,14 @@ public class GUI extends JFrame{
             out.println(studentInfo[0].getText() + " " + studentInfo[1].getText()
             + " " + studentInfo[2].getText() + " " + studentInfo[3].getText());
             out.close();
+        }
+    }
+
+    class submitLoginHandler implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            if (studentInfo[1].equals(userText.getText()) && studentInfo[2].equals(passwordText.getPassword())){
+                cardLayout.show(frame.getContentPane(), "testPanel"); //not working
+            }
         }
     }
 
