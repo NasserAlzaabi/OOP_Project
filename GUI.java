@@ -12,7 +12,7 @@ class GUI{
     private JPanel mainPanel,loginPanel,signupPanel;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
-    private JButton loginButton,signupButton,returnButton,submitLogin,submitSignup;
+    private JButton loginButton,signupButton,returnButton1,returnButton2,submitLogin,submitSignup,exitButton;
     private JTextField userText;
     private JPasswordField passwordText;
 
@@ -25,17 +25,19 @@ class GUI{
         signupPanel = new JPanel();
         cardLayout = new CardLayout();
 
-        mainLabel = new JLabel("Login or Sign Up");
-        userLabel = new JLabel("Usesxdfrname: ");
-        passwordLabel = new JLabel("Password:");
-
         loginButton = new JButton("Login");
         loginButton.addActionListener(new loginHandler());
-        submitLogin = new JButton("Submit Login");
+        submitLogin = new JButton("Submit");
+        submitSignup = new JButton("Submit");
+        submitSignup.addActionListener(new submitSignupHandler());
         signupButton = new JButton("Sign Up");
         signupButton.addActionListener(new signupHandler());
-        returnButton = new JButton("Return");
-        returnButton.addActionListener(new returnHandler());
+        returnButton1 = new JButton("Return");
+        returnButton1.addActionListener(new return1Handler());
+        returnButton2 = new JButton("Return");
+        returnButton2.addActionListener(new return2Handler());
+        exitButton = new JButton("Exit");
+        exitButton.addActionListener(new exitHandler());
 
 
         userText = new JTextField();
@@ -48,29 +50,13 @@ class GUI{
         frame.add(signupPanel, "SignupPanel");
         frame.setSize(400,250);
         frame.setLocationRelativeTo(null);
-        
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        mainPanel.setLayout(new GridLayout(3,3));
-        mainPanel.add(new JLabel());
-        mainPanel.add(mainLabel);
-        mainPanel.add(new JLabel());
-        mainPanel.add(new JLabel());
-        mainPanel.add(new JLabel());
-        mainPanel.add(new JLabel());
-        mainPanel.add(loginButton);
-        mainPanel.add(new JLabel());
-        mainPanel.add(signupButton);
-
-        loginPanel.setLayout(new GridLayout(4,4));
-        loginPanel.add(userLabel);
-        loginPanel.add(userText);
-        loginPanel.add(passwordLabel);
-        loginPanel.add(passwordText);
-        loginPanel.add(submitLogin);
-        loginPanel.add(returnButton);
+        
 
         frame.setVisible(true);
+        mainP();
+        logIn();
         signUp();
     }
 
@@ -78,13 +64,35 @@ class GUI{
     private JTextField[] studentInfo;
     PrintWriter out = new PrintWriter("studentInfo.txt");
 
+    public void mainP(){
+        mainPanel.setLayout(new GridLayout(3,3));
+        mainPanel.add(new JLabel());
+        mainPanel.add(new JLabel("Login or Sign Up"));
+        mainPanel.add(new JLabel());
+        mainPanel.add(new JLabel());
+        mainPanel.add(new JLabel());
+        mainPanel.add(new JLabel());
+        mainPanel.add(loginButton);
+        mainPanel.add(signupButton);
+        mainPanel.add(exitButton);
+    }
+
+
+    public void logIn(){
+        loginPanel.setLayout(new GridLayout(3,2));
+        loginPanel.add(new JLabel("Username: "));
+        loginPanel.add(userText);
+        loginPanel.add(new JLabel("Password: "));
+        loginPanel.add(passwordText);
+        loginPanel.add(returnButton1);
+        loginPanel.add(submitLogin);
+    }
+
     public void signUp(){
         studentInfo = new JTextField[4];
 		for (int i = 0; i < 4; i++) studentInfo[i] = new JTextField();
 
-        signupPanel.setLayout(new GridLayout(4,4));
-		
-
+        signupPanel.setLayout(new GridLayout(5,4));
 
         signupPanel.add(new JLabel("ID: "));
         signupPanel.add(studentInfo[0]);
@@ -94,9 +102,9 @@ class GUI{
         signupPanel.add(studentInfo[2]);
         signupPanel.add(new JLabel("Phone number: "));
         signupPanel.add(studentInfo[3]);
-        out.println(studentInfo[0].getText() + studentInfo[1].getText() + studentInfo[2].getText() + studentInfo[3].getText());
-        out.close();
-    }
+        signupPanel.add(returnButton2);
+        signupPanel.add(submitSignup);
+        }
     
     class loginHandler implements ActionListener{
         public void actionPerformed(ActionEvent e){
@@ -110,11 +118,29 @@ class GUI{
         }
     }
 
-    class returnHandler implements ActionListener{
+    class submitSignupHandler implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            out.println(studentInfo[0].getText() + " " + studentInfo[1].getText()
+            + " " + studentInfo[2].getText() + " " + studentInfo[3].getText());
+            out.close();
+        }
+    }
+
+    class return1Handler implements ActionListener{
         public void actionPerformed(ActionEvent e){
             cardLayout.show(frame.getContentPane(), "MainPanel");
         }
-
     }
 
+    class return2Handler implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            cardLayout.show(frame.getContentPane(), "MainPanel");
+        }
+    }
+
+    class exitHandler implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            System.exit(0);
+        }
+    }
 }
