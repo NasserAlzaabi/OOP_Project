@@ -1,4 +1,6 @@
-public class Student extends User{
+package OOP_Project;
+
+class Student extends User{
 	
 	String phone_Number;
 

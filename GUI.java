@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
-class GUI{
+public class GUI extends JFrame{
     private JFrame frame;
     private JPanel mainPanel,loginPanel,signupPanel;
     private CardLayout cardLayout;
