@@ -26,20 +26,22 @@ public class GUI extends JFrame{
         testPanel = new JPanel();
         cardLayout = new CardLayout();
 
-        loginButton = new JButton("Login");
-        loginButton.addActionListener(new loginHandler());
+        ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
+
+        loginButton = new JButton("Login"); // creates Buttons
         submitLogin = new JButton("Submit");
         submitSignup = new JButton("Submit");
-        submitSignup.addActionListener(new submitSignupHandler());
         signupButton = new JButton("Sign Up");
-        signupButton.addActionListener(new signupHandler());
         returnButton1 = new JButton("Return");
-        returnButton1.addActionListener(new return1Handler());
         returnButton2 = new JButton("Return");
-        returnButton2.addActionListener(new return2Handler());
         exitButton = new JButton("Exit");
-        exitButton.addActionListener(new exitHandler());
-
+        
+        loginButton.addActionListener(BH);  //links handeler to buttons
+        submitSignup.addActionListener(BH);
+        signupButton.addActionListener(BH);
+        returnButton1.addActionListener(BH);
+        returnButton2.addActionListener(BH);
+        exitButton.addActionListener(BH);
 
         userText = new JTextField();
         passwordText = new JPasswordField();
@@ -97,7 +99,7 @@ public class GUI extends JFrame{
         studentInfo = new JTextField[4];
 		for (int i = 0; i < 4; i++) studentInfo[i] = new JTextField();
 
-        signupPanel.setLayout(new GridLayout(5,4));
+        signupPanel.setLayout(new GridLayout(6,4));
 
         signupPanel.add(new JLabel("ID: "));
         signupPanel.add(studentInfo[0]);
@@ -110,24 +112,31 @@ public class GUI extends JFrame{
         signupPanel.add(returnButton2);
         signupPanel.add(submitSignup);
         }
+    final JLabel label = new JLabel("Please enter all required information");
     
-    class loginHandler implements ActionListener{
+    class ButtonHandler implements ActionListener{
         public void actionPerformed(ActionEvent e){
-            cardLayout.show(frame.getContentPane(), "LoginPanel");
-        }
-    }
+            if (e.getActionCommand().equals("Login"))
+                cardLayout.show(frame.getContentPane(), "LoginPanel");
+            if (e.getActionCommand().equals("Sign Up"))
+                cardLayout.show(frame.getContentPane(), "SignupPanel");
+            if (e.getActionCommand().equals("Return"))
+                cardLayout.show(frame.getContentPane(), "MainPanel");
+            if (e.getActionCommand().equals("Submit")){
+                if ((studentInfo[0].getText().isEmpty() || studentInfo[1].getText().isEmpty()
+                || studentInfo[2].getText().isEmpty() || studentInfo[3].getText().isEmpty())){
+                    signupPanel.add(label); // have to figure how to set size to 2 columns and how to make sure it is only called once if submit is pressed repeatedly.
+                    frame.setVisible(true);
+                }
+                else
+                    out.println(studentInfo[0].getText() + " " + studentInfo[1].getText()
+                    + " " + studentInfo[2].getText() + " " + studentInfo[3].getText());
+            }
+            if (e.getActionCommand().equals("Exit")){
+                out.close();    
+                System.exit(0);
+            }
 
-    class signupHandler implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-            cardLayout.show(frame.getContentPane(), "SignupPanel");
-        }
-    }
-
-    class submitSignupHandler implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-            out.println(studentInfo[0].getText() + " " + studentInfo[1].getText()
-            + " " + studentInfo[2].getText() + " " + studentInfo[3].getText());
-            out.close();
         }
     }
 
@@ -135,25 +144,8 @@ public class GUI extends JFrame{
         public void actionPerformed(ActionEvent e){
             if (studentInfo[1].equals(userText.getText()) && studentInfo[2].equals(passwordText.getPassword())){
                 cardLayout.show(frame.getContentPane(), "testPanel"); //not working
-            }
+            }                                                              //what were u trying to do with it. cant fix it if idk whats wrong.
         }
     }
 
-    class return1Handler implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-            cardLayout.show(frame.getContentPane(), "MainPanel");
-        }
-    }
-
-    class return2Handler implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-            cardLayout.show(frame.getContentPane(), "MainPanel");
-        }
-    }
-
-    class exitHandler implements ActionListener{
-        public void actionPerformed(ActionEvent e){
-            System.exit(0);
-        }
-    }
 }
