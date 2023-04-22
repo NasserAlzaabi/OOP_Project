@@ -1,8 +1,10 @@
 package OOP_Project;
 
+import java.util.Scanner;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -18,6 +20,7 @@ public class GUI extends JFrame{
     private JPasswordField passwordText;
     private JButton[] returnButton = new JButton[3];
     Technician tech = new Technician();
+    private int studentCount = 0; //counts how many students signed up (for login)
 
     public GUI() throws FileNotFoundException{
         //general JFrame structure setup
@@ -109,7 +112,7 @@ public class GUI extends JFrame{
 
         signupPanel.add(new JLabel("ID: "));
         signupPanel.add(studentInfo[0]);
-        signupPanel.add(new JLabel("Name: "));
+        signupPanel.add(new JLabel("Username: "));
         signupPanel.add(studentInfo[1]);
         signupPanel.add(new JLabel("Password: "));
         signupPanel.add(studentInfo[2]);
@@ -120,7 +123,7 @@ public class GUI extends JFrame{
     }
 
     public void studentP(){
-
+        studentPanel.add(new JLabel("successful login"));
 
     }
 
@@ -134,6 +137,24 @@ public class GUI extends JFrame{
         successPanel.add(new JLabel());
         successPanel.add(new JLabel("Press to return to login."));
         successPanel.add(returnButton[2]);
+    }
+
+    public boolean checkLogin(String username, String password){//method that goes in file to check student data
+        boolean isLogin = false;
+        try {
+            Scanner fin = new Scanner (new File("studentInfo.txt"));
+            while(fin.hasNextLine()){
+                String line = fin.nextLine();
+                String[] data = line.split(" ");
+                if(data[1].equals(username) && data[2].equals(password)){
+                    isLogin = true;
+                    break;
+                }
+            }
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return isLogin;
     }
 
     final JLabel enterInfo = new JLabel("Enter all required information.");
@@ -161,8 +182,13 @@ public class GUI extends JFrame{
                 }
             }
             if (e.getActionCommand().equals("Enter")){ //need to add login for student too here !!!
-                if(userText.getText().equals(tech.getName()) && passwordText.getText().equals(tech.getPassowrd()))
+                String usernameCheck = userText.getText();
+                String passwordCheck = new String(passwordText.getPassword());
+                if(usernameCheck.equals(tech.getName()) && passwordCheck.equals(tech.getPassword()))
                     cardLayout.show(frame.getContentPane(), "techPanel");
+                if(checkLogin(usernameCheck,passwordCheck)){
+                    cardLayout.show(frame.getContentPane(), "studentPanel");
+                }
                 else{
                     loginPanel.add(incorrectLogin);
                     frame.setVisible(true);
@@ -171,14 +197,6 @@ public class GUI extends JFrame{
             if (e.getActionCommand().equals("Exit")){
                 System.exit(0);
             }
-        }
-    }
-
-    class submitLoginHandler implements ActionListener{ //zayed if u dont need this delete
-        public void actionPerformed(ActionEvent e){
-            if (studentInfo[1].equals(userText.getText()) && studentInfo[2].equals(passwordText.getText())){
-                cardLayout.show(frame.getContentPane(), "testPanel"); //not working
-            }                                                              //what were u trying to do with it. cant fix it if idk whats wrong.
         }
     }
 

@@ -7,7 +7,7 @@ class Technician extends User{
         return name;
     }
 
-    public String getPassowrd() {
+    public String getPassword() {
         return passowrd;
     }
     
