@@ -1,13 +1,19 @@
 package OOP_Project;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 
 public class GUI extends JFrame{
@@ -19,8 +25,15 @@ public class GUI extends JFrame{
     private JTextField userText;
     private JPasswordField passwordText;
     private JButton[] returnButton = new JButton[3];
+    
+    PrintWriter pout;
     Technician tech = new Technician();
     private int studentCount = 0; //counts how many students signed up (for login)
+    private FileOutputStream fout;
+    private FileInputStream fin;
+    ObjectInputStream in;
+    ObjectOutputStream out;
+    ArrayList<Student> students = new ArrayList<Student>();
 
     public GUI() throws FileNotFoundException{
         //general JFrame structure setup
@@ -75,11 +88,11 @@ public class GUI extends JFrame{
         signUp();
         successP();
         techP();
+        studentP();
     }
 
     
     private JTextField[] studentInfo;
-    PrintWriter out = new PrintWriter(new FileOutputStream("studentInfo.txt", true));
 
     public void mainP(){
         mainPanel.setLayout(new GridLayout(3,3));
@@ -157,6 +170,37 @@ public class GUI extends JFrame{
         return isLogin;
     }
 
+    public void checkUser(){
+        String usernameCheck = userText.getText();
+        String passwordCheck = new String(passwordText.getPassword());
+            if(usernameCheck.equals(tech.getName()) && passwordCheck.equals(tech.getPassword()))
+                cardLayout.show(frame.getContentPane(), "techPanel");
+            if(checkLogin(usernameCheck,passwordCheck)){
+                cardLayout.show(frame.getContentPane(), "studentPanel");
+            }
+            else{
+                loginPanel.add(incorrectLogin);
+                frame.setVisible(true);
+            }
+    }
+    // public void storeStudent(){ ignore might delete later if not needed
+    //     Student temp;
+        
+    //     try {
+    //         fin = new FileInputStream("studentInfo.txt");
+    //         while (true) {
+    //             ObjectInputStream in = new ObjectInputStream(fin);
+    //                 try {
+    //                     temp = (Student) in.readObject();
+    //                     students.add((Student) temp);
+    //                 } catch (EOFException e) { break; }
+    //             }
+    //             in.close();
+    //         } catch (FileNotFoundException a) { a.printStackTrace();  }
+    //         catch (IOException e) { e.printStackTrace();}
+    //         catch (ClassNotFoundException e) {e.printStackTrace();}
+    // }
+
     final JLabel enterInfo = new JLabel("Enter all required information.");
     final JLabel incorrectLogin = new JLabel("Incorrect Username or Password");
 
@@ -175,24 +219,18 @@ public class GUI extends JFrame{
                     frame.setVisible(true);
                 }
                 else{
-                    out.append(studentInfo[0].getText() + " " + studentInfo[1].getText()
+                    try {
+                    pout = new PrintWriter(new FileOutputStream("studentInfo.txt", true));
+                    pout.append(studentInfo[0].getText() + " " + studentInfo[1].getText()
                     + " " + studentInfo[2].getText() + " " + studentInfo[3].getText() + "\n");
                     cardLayout.show(frame.getContentPane(), "successPanel");
-                    out.close();   //error where we can only create one acc once every time we call main !!! need to fix
-                }
+                    pout.close();
+                    //storeStudent();
+                    } catch (FileNotFoundException a) {a.printStackTrace();}
+                } 
             }
             if (e.getActionCommand().equals("Enter")){ //need to add login for student too here !!!
-                String usernameCheck = userText.getText();
-                String passwordCheck = new String(passwordText.getPassword());
-                if(usernameCheck.equals(tech.getName()) && passwordCheck.equals(tech.getPassword()))
-                    cardLayout.show(frame.getContentPane(), "techPanel");
-                if(checkLogin(usernameCheck,passwordCheck)){
-                    cardLayout.show(frame.getContentPane(), "studentPanel");
-                }
-                else{
-                    loginPanel.add(incorrectLogin);
-                    frame.setVisible(true);
-                }
+                checkUser();
             }
             if (e.getActionCommand().equals("Exit")){
                 System.exit(0);
