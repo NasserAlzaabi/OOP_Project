@@ -18,12 +18,12 @@ import java.io.PrintWriter;
 
 public class GUI extends JFrame{
     private JFrame frame;
-    private JPanel mainPanel,loginPanel,signupPanel,successPanel,studentPanel,techPanel;
+    private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel,techPanel, techLoginPanel;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
-    private JButton loginButton,signupButton,submitLogin,submitSignup,exitButton;
-    private JTextField userText;
-    private JPasswordField passwordText;
+    private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton,studentButton,technicianButton,RSButton,RSButton2;
+    private JTextField userText,TechText;
+    private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[3];
     
     PrintWriter pout;
@@ -38,9 +38,12 @@ public class GUI extends JFrame{
     public GUI() throws FileNotFoundException{
         //general JFrame structure setup
 
-        frame = new JFrame("LIMA Project"); 
+        frame = new JFrame("LIMA Project");
+         
+        techOrStuPanel = new JPanel();
         mainPanel = new JPanel();
         loginPanel = new JPanel();
+        techLoginPanel = new JPanel();
         signupPanel = new JPanel();
         successPanel = new JPanel();
         studentPanel = new JPanel();
@@ -48,19 +51,28 @@ public class GUI extends JFrame{
         cardLayout = new CardLayout();
 
         ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
-
+        RSButton = new JButton("Return to Selection");
+        RSButton2 = new JButton("Return to Selection");
+        studentButton = new JButton("Student");
+        technicianButton = new JButton("Technician");
         loginButton = new JButton("Login"); // creates Buttons
         submitLogin = new JButton("Enter");
+        TsubmitLogin = new JButton("Enter");
         submitSignup = new JButton("Submit");
         signupButton = new JButton("Sign Up");
         
         exitButton = new JButton("Exit");
         
+        RSButton.addActionListener(BH);
+        RSButton2.addActionListener(BH);
+        studentButton.addActionListener(BH);
+        technicianButton.addActionListener(BH);
         loginButton.addActionListener(BH);  //links handeler to buttons
         submitSignup.addActionListener(BH);
         signupButton.addActionListener(BH);
         exitButton.addActionListener(BH);
         submitLogin.addActionListener(BH);
+        TsubmitLogin.addActionListener(BH);
 
         for (int i = 0; i < 3; i++){ //creates 3 of the same button, all of them return to main screen
             returnButton[i] = new JButton("Return");
@@ -68,29 +80,48 @@ public class GUI extends JFrame{
         }
 
         userText = new JTextField();
+        TechText = new JTextField();
         passwordText = new JPasswordField();
+        techPassword = new JPasswordField();
 
         //adding components to different panels
         frame.setLayout(cardLayout);
+        frame.add(techOrStuPanel,"TechOrStuPanel");
         frame.add(mainPanel,"MainPanel");
         frame.add(loginPanel,"LoginPanel");
+        frame.add(techLoginPanel,"techLoginPanel");
         frame.add(signupPanel, "SignupPanel");
         frame.add(successPanel, "successPanel");
         frame.add(studentPanel, "studentPanel");
         frame.add(techPanel, "techPanel");
-        frame.setSize(400,250);
+        frame.setSize(500,300);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.setVisible(true);
+        techOrStu();
         mainP();
         logIn();
+        TlogIn();
         signUp();
         successP();
         techP();
         studentP();
     }
 
+    public void techOrStu(){
+
+        techOrStuPanel.setLayout(new GridLayout(3,3));
+        techOrStuPanel.add(new JLabel()); 
+        techOrStuPanel.add(new JLabel("Student or Technician"));
+        techOrStuPanel.add(new JLabel());
+        techOrStuPanel.add(new JLabel());
+        techOrStuPanel.add(new JLabel());
+        techOrStuPanel.add(new JLabel());
+        techOrStuPanel.add(studentButton);
+        techOrStuPanel.add(new JLabel());
+        techOrStuPanel.add(technicianButton);
+    }
     
     private JTextField[] studentInfo;
 
@@ -104,7 +135,7 @@ public class GUI extends JFrame{
         mainPanel.add(new JLabel());
         mainPanel.add(loginButton);
         mainPanel.add(signupButton);
-        mainPanel.add(exitButton);
+        mainPanel.add(RSButton);
     }
 
     public void logIn(){
@@ -115,6 +146,15 @@ public class GUI extends JFrame{
         loginPanel.add(passwordText);
         loginPanel.add(returnButton[0]);
         loginPanel.add(submitLogin);
+    }
+    public void TlogIn(){
+        techLoginPanel.setLayout(new GridLayout(4,2));
+        techLoginPanel.add(new JLabel("Username: "));
+        techLoginPanel.add(TechText);
+        techLoginPanel.add(new JLabel("Password: "));
+        techLoginPanel.add(techPassword);
+        techLoginPanel.add(RSButton2);
+        techLoginPanel.add(TsubmitLogin);
     }
 
     public void signUp(){
@@ -172,8 +212,10 @@ public class GUI extends JFrame{
 
     public void checkUser(){
         String usernameCheck = userText.getText();
+        String TechnicianCheck = TechText.getText();
         String passwordCheck = new String(passwordText.getPassword());
-            if(usernameCheck.equals(tech.getName()) && passwordCheck.equals(tech.getPassword()))
+        String TPassCheck = new String(techPassword.getPassword());
+            if(TechnicianCheck.equals(tech.getName()) && TPassCheck.equals(tech.getPassword()))
                 cardLayout.show(frame.getContentPane(), "techPanel");
             if(checkLogin(usernameCheck,passwordCheck)){
                 cardLayout.show(frame.getContentPane(), "studentPanel");
@@ -212,6 +254,9 @@ public class GUI extends JFrame{
                 cardLayout.show(frame.getContentPane(), "SignupPanel");
             if (e.getActionCommand().equals("Return"))
                 cardLayout.show(frame.getContentPane(), "MainPanel");
+            if (e.getActionCommand().equals("Return to Selection")){
+                cardLayout.show(frame.getContentPane(), "TechOrStuPanel");
+            }
             if (e.getActionCommand().equals("Submit")){
                 if ((studentInfo[0].getText().isEmpty() || studentInfo[1].getText().isEmpty()
                 || studentInfo[2].getText().isEmpty() || studentInfo[3].getText().isEmpty())){
@@ -228,6 +273,12 @@ public class GUI extends JFrame{
                     //storeStudent();
                     } catch (FileNotFoundException a) {a.printStackTrace();}
                 } 
+            }
+            if (e.getActionCommand().equals("Student")){
+                cardLayout.show(frame.getContentPane(), "MainPanel");
+            }
+            if (e.getActionCommand().equals("Technician")){
+                cardLayout.show(frame.getContentPane(), "techLoginPanel");
             }
             if (e.getActionCommand().equals("Enter")){ //need to add login for student too here !!!
                 checkUser();
