@@ -27,7 +27,7 @@ public class GUI extends JFrame{
     private JButton[] returnButton = new JButton[3];
     
     PrintWriter pout;
-    Technician tech = new Technician();
+    Technician tech = new Technician(); //technician
     private int studentCount = 0; //counts how many students signed up (for login)
     private FileOutputStream fout;
     private FileInputStream fin;
@@ -140,7 +140,7 @@ public class GUI extends JFrame{
 
     public void logIn(){
         loginPanel.setLayout(new GridLayout(4,2));
-        loginPanel.add(new JLabel("Username: "));
+        loginPanel.add(new JLabel("ID: "));
         loginPanel.add(userText);
         loginPanel.add(new JLabel("Password: "));
         loginPanel.add(passwordText);
@@ -149,7 +149,7 @@ public class GUI extends JFrame{
     }
     public void TlogIn(){
         techLoginPanel.setLayout(new GridLayout(4,2));
-        techLoginPanel.add(new JLabel("Username: "));
+        techLoginPanel.add(new JLabel("Name: "));
         techLoginPanel.add(TechText);
         techLoginPanel.add(new JLabel("Password: "));
         techLoginPanel.add(techPassword);
@@ -165,7 +165,7 @@ public class GUI extends JFrame{
 
         signupPanel.add(new JLabel("ID: "));
         signupPanel.add(studentInfo[0]);
-        signupPanel.add(new JLabel("Username: "));
+        signupPanel.add(new JLabel("Name: "));
         signupPanel.add(studentInfo[1]);
         signupPanel.add(new JLabel("Password: "));
         signupPanel.add(studentInfo[2]);
@@ -175,12 +175,12 @@ public class GUI extends JFrame{
         signupPanel.add(submitSignup);
     }
 
-    public void studentP(){
+    public void studentP(){ //panel after logging into student
         studentPanel.add(new JLabel("successful login"));
 
     }
 
-    public void techP(){
+    public void techP(){ //panel after logging into tech
         techPanel.add(new JLabel("U are in tech panel"));
     }
 
@@ -192,14 +192,14 @@ public class GUI extends JFrame{
         successPanel.add(returnButton[2]);
     }
 
-    public boolean checkLogin(String username, String password){//method that goes in file to check student data
+    public boolean checkLogin(String id, String password){//method that goes in file to check student data
         boolean isLogin = false;
         try {
             Scanner fin = new Scanner (new File("studentInfo.txt"));
             while(fin.hasNextLine()){
                 String line = fin.nextLine();
                 String[] data = line.split(" ");
-                if(data[1].equals(username) && data[2].equals(password)){
+                if(data[0].equals(id) && data[2].equals(password)){
                     isLogin = true;
                     break;
                 }
@@ -210,14 +210,15 @@ public class GUI extends JFrame{
         return isLogin;
     }
 
-    public void checkUser(){
-        String usernameCheck = userText.getText();
-        String TechnicianCheck = TechText.getText();
+    public void checkUser(){ //function that checks if the user can login and returns boolean
+        String nameCheck = userText.getText();
         String passwordCheck = new String(passwordText.getPassword());
+        String TechnicianCheck = TechText.getText();
         String TPassCheck = new String(techPassword.getPassword());
             if(TechnicianCheck.equals(tech.getName()) && TPassCheck.equals(tech.getPassword()))
                 cardLayout.show(frame.getContentPane(), "techPanel");
-            if(checkLogin(usernameCheck,passwordCheck)){
+
+            if(checkLogin(nameCheck,passwordCheck)){
                 cardLayout.show(frame.getContentPane(), "studentPanel");
             }
             else{
@@ -225,26 +226,16 @@ public class GUI extends JFrame{
                 frame.setVisible(true);
             }
     }
-    // public void storeStudent(){ ignore might delete later if not needed
-    //     Student temp;
-        
-    //     try {
-    //         fin = new FileInputStream("studentInfo.txt");
-    //         while (true) {
-    //             ObjectInputStream in = new ObjectInputStream(fin);
-    //                 try {
-    //                     temp = (Student) in.readObject();
-    //                     students.add((Student) temp);
-    //                 } catch (EOFException e) { break; }
-    //             }
-    //             in.close();
-    //         } catch (FileNotFoundException a) { a.printStackTrace();  }
-    //         catch (IOException e) { e.printStackTrace();}
-    //         catch (ClassNotFoundException e) {e.printStackTrace();}
-    // }
+
+
+    //its in the name
+    public void createNewStudent(String newID, String newName, String newPassword, String newPhoneNumber){
+        Student newStudent = new Student(newID, newName, newPassword, newPhoneNumber,"");
+        students.add(newStudent);
+    }
 
     final JLabel enterInfo = new JLabel("Enter all required information.");
-    final JLabel incorrectLogin = new JLabel("Incorrect Username or Password");
+    final JLabel incorrectLogin = new JLabel("Incorrect Name or Password");
 
     class ButtonHandler implements ActionListener{
         public void actionPerformed(ActionEvent e){
@@ -272,6 +263,14 @@ public class GUI extends JFrame{
                     pout.close();
                     //storeStudent();
                     } catch (FileNotFoundException a) {a.printStackTrace();}
+
+                    //Adds student to arraylist students
+                    createNewStudent(studentInfo[0].getText(), studentInfo[1].getText(), studentInfo[2].getText(), studentInfo[3].getText());
+                    studentInfo[0].setText(""); //fixes a bug so when you click signup again,
+                    studentInfo[1].setText(""); // it doesnt have the data of the previous user
+                    studentInfo[2].setText(""); // in the textfield
+                    studentInfo[3].setText(""); 
+                    
                 } 
             }
             if (e.getActionCommand().equals("Student")){
@@ -280,7 +279,7 @@ public class GUI extends JFrame{
             if (e.getActionCommand().equals("Technician")){
                 cardLayout.show(frame.getContentPane(), "techLoginPanel");
             }
-            if (e.getActionCommand().equals("Enter")){ //need to add login for student too here !!!
+            if (e.getActionCommand().equals("Enter")){
                 checkUser();
             }
             if (e.getActionCommand().equals("Exit")){
@@ -288,5 +287,4 @@ public class GUI extends JFrame{
             }
         }
     }
-
 }

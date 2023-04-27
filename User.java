@@ -3,17 +3,17 @@ import java.io.*;
 import java.util.*;
 
 class User{
-    protected String name, user_id, pass;
+    protected String user_id, name, pass;
 
     public User(){
-        name = "";
         user_id = "";
+        name = "";
         pass = "";
     }
 
-    public User(String n, String u, String p){
+    public User(String n, String id, String p){
+        user_id = id;
         name = n;
-        user_id = u;
         pass = p;
     }
 
