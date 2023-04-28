@@ -1,0 +1,2 @@
+Resistor 1234 3 20 y
+Infrared sensor 4341 132 2 n

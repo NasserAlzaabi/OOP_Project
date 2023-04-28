@@ -18,4 +18,8 @@ class Student extends User{
 		this.phone_Number = phone_Number;
 		this.items = BorrowedItems;
 	}
+
+	// public String sendItemRequest(){
+		
+	// }
 }

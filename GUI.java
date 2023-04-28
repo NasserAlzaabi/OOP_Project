@@ -15,16 +15,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.security.InvalidKeyException;
 
 public class GUI extends JFrame{
     private JFrame frame;
-    private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel,techPanel, techLoginPanel, inventoryPanel;
+    private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
+    private JPanel techPanel, techLoginPanel, inventoryPanel;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
-    private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton,studentButton,technicianButton,RSButton,RSButton2;
+    private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton;
+    private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton;
     private JTextField userText,TechText;
     private JPasswordField passwordText,techPassword;
-    private JButton[] returnButton = new JButton[3];
+    private JButton[] returnButton = new JButton[4];
     
     PrintWriter pout;
     Technician tech = new Technician(); //technician
@@ -57,9 +60,10 @@ public class GUI extends JFrame{
 
         RSButton = new JButton("Return to Selection");
         RSButton2 = new JButton("Return to Selection");
+        techBackButton = new JButton("Return to Main Menu"); //return button for tech panel
         studentButton = new JButton("Student");
         technicianButton = new JButton("Technician");
-        loginButton = new JButton("Login"); // creates Buttons
+        loginButton = new JButton("Login");
         submitLogin = new JButton("Enter");
         TsubmitLogin = new JButton("Enter");
         submitSignup = new JButton("Submit");
@@ -73,6 +77,7 @@ public class GUI extends JFrame{
 
         RSButton.addActionListener(BH);
         RSButton2.addActionListener(BH);
+        techBackButton.addActionListener(BH);
         studentButton.addActionListener(BH);
         technicianButton.addActionListener(BH);
         loginButton.addActionListener(BH);  //links handeler to buttons
@@ -88,7 +93,7 @@ public class GUI extends JFrame{
         invDelete.addActionListener(TH);
         invEdit.addActionListener(TH);
 
-        for (int i = 0; i < 3; i++){ //creates 3 of the same button, all of them return to main screen
+        for (int i = 0; i < 4; i++){ //creates 3 of the same button, all of them return to main screen
             returnButton[i] = new JButton("Return");
             returnButton[i].addActionListener(BH);
         }
@@ -193,7 +198,10 @@ public class GUI extends JFrame{
     }
 
     public void studentP(){ //panel after logging into student
+        studentPanel.setLayout(new GridLayout(3,1));
         studentPanel.add(new JLabel("successful login"));
+        studentPanel.add(new JLabel("")); //item button for student (will work on soon)
+        studentPanel.add(returnButton[3]);
 
     }
 
@@ -202,15 +210,15 @@ public class GUI extends JFrame{
     public void techP(){ //panel after logging into tech
         techPanel.setLayout(new GridLayout(5, 5));
         techPanel.add(inventoryButton);
-        techPanel.add(new JLabel("U are in tech panel"));
+        techPanel.add(new JLabel(""));
+        techPanel.add(techBackButton);
     }
 
-    private JTextField iName, iModel, iValue, iQuantity, iConsumable;
+    private JTextField iName, iModel, iValue, iQuantity, iDate, iConsumable;
     private JButton iEnter, invReturn, invEdit, invDelete;
 
     public void invP(){ //Panel for tech to add remove edit items
 
-        
         inventoryPanel.setLayout(new GridLayout(9,2, 5, 5));
         inventoryPanel.add(new JLabel("  Please enter all requested infor"));
         inventoryPanel.add(invReturn);
@@ -224,6 +232,8 @@ public class GUI extends JFrame{
         inventoryPanel.add(iQuantity = new JTextField());
         inventoryPanel.add(new JLabel("  Item Consumable (y/n):"));
         inventoryPanel.add(iConsumable = new JTextField());
+        inventoryPanel.add(new JLabel("  Item Date(ddmmyy): "));
+        inventoryPanel.add(iDate = new JTextField());
         inventoryPanel.add(iEnter);
         inventoryPanel.add(invDelete);
         inventoryPanel.add(invEdit); //edit still work in progress
@@ -249,9 +259,7 @@ public class GUI extends JFrame{
                     break;
                 }
             }
-        } catch(FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        } catch(FileNotFoundException e) {e.printStackTrace();}
         return isLogin;
     }
 
@@ -260,10 +268,12 @@ public class GUI extends JFrame{
         String passwordCheck = new String(passwordText.getPassword());
         String TechnicianCheck = TechText.getText();
         String TPassCheck = new String(techPassword.getPassword());
-            if(TechnicianCheck.equals(tech.getName()) && TPassCheck.equals(tech.getPassword()))
+            if(TechnicianCheck.equals(tech.getName()) && TPassCheck.equals(tech.getPassword())){
+                TechText.setText(""); techPassword.setText("");
                 cardLayout.show(frame.getContentPane(), "techPanel");
-
+            }
             if(checkLogin(nameCheck,passwordCheck)){
+                userText.setText(""); passwordText.setText("");
                 cardLayout.show(frame.getContentPane(), "studentPanel");
             }
             else{
@@ -292,9 +302,10 @@ public class GUI extends JFrame{
                 cardLayout.show(frame.getContentPane(), "SignupPanel");
             if (e.getActionCommand().equals("Return"))
                 cardLayout.show(frame.getContentPane(), "MainPanel");
-            if (e.getActionCommand().equals("Return to Selection")){
+            if (e.getActionCommand().equals("Return to Selection"))
                 cardLayout.show(frame.getContentPane(), "TechOrStuPanel");
-            }
+            if (e.getActionCommand().equals("Return to Main Menu"))
+                cardLayout.show(frame.getContentPane(), "TechOrStuPanel");
             if (e.getActionCommand().equals("Submit")){ //submiting signup for students
                 if ((studentInfo[0].getText().isEmpty() || studentInfo[1].getText().isEmpty()
                 || studentInfo[2].getText().isEmpty() || studentInfo[3].getText().isEmpty())){
@@ -312,7 +323,9 @@ public class GUI extends JFrame{
                     } catch (FileNotFoundException a) {a.printStackTrace();}
 
                     //Adds student to arraylist students
-                    createNewStudent(studentInfo[0].getText(), studentInfo[1].getText(), studentInfo[2].getText(), studentInfo[3].getText());
+                    createNewStudent(studentInfo[0].getText(), studentInfo[1].getText(),
+                    studentInfo[2].getText(), studentInfo[3].getText());
+
                     studentInfo[0].setText(""); //fixes a bug so when you click signup again,
                     studentInfo[1].setText(""); // it doesnt have the data of the previous user
                     studentInfo[2].setText(""); // in the textfield
@@ -339,13 +352,18 @@ public class GUI extends JFrame{
 
     public void addInventory(){ //checks if entered item information, saves it to inventory 
         if (iName.getText().isEmpty() || iModel.getText().isEmpty() || iConsumable.getText().isEmpty()
-            || iQuantity.getText().isEmpty() || iValue.getText().isEmpty()){
+            || iQuantity.getText().isEmpty() || iValue.getText().isEmpty() || iDate.getText().isEmpty()){
                 inventoryPanel.remove(iAdded);
                 inventoryPanel.add(enterInfo); 
                 frame.setVisible(true);
-                    
             }
         else{
+            try{  //appends add item to inventory file
+                pout = new PrintWriter(new FileOutputStream("inventory.txt", true));
+                pout.append(iName.getText() + " " + iModel.getText() + " " + iValue.getText() + " " +
+                iQuantity.getText() + " " + iConsumable.getText() + " " + iDate.getText() + "\n");
+                pout.close();
+            } catch (FileNotFoundException a) {a.printStackTrace();} 
             inventoryPanel.remove(enterInfo);
             inventoryPanel.add(iAdded);
             frame.setVisible(true);
@@ -354,9 +372,11 @@ public class GUI extends JFrame{
                 cons = true;
             else // if another string is inputted it defaults to false
                 cons = false;
-            inventory.add(new Item(iName.getText(), iModel.getText(), Integer.parseInt(iValue.getText()), Integer.parseInt(iQuantity.getText()), cons));
+            inventory.add(new Item(iName.getText(), iModel.getText(), Integer.parseInt(iValue.getText()),
+            Integer.parseInt(iQuantity.getText()), cons, Integer.parseInt(iDate.getText())));
+
             iName.setText(""); iModel.setText(""); iValue.setText("");
-            iQuantity.setText(""); iConsumable.setText(""); //resets textfields
+            iQuantity.setText(""); iConsumable.setText(""); iDate.setText(""); //resets textfields
         }
     }
 
@@ -382,5 +402,4 @@ public class GUI extends JFrame{
                 deleteItem();
         }
     }
-    
 }

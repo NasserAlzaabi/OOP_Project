@@ -3,15 +3,19 @@ package OOP_Project;
 public class Item {
 	
 	protected String name, model;
-	protected int value, quantity;
-	boolean Consumable;
+	protected int value, quantity, date; //date :ddmmyy:
+	boolean consumable;
 	
-	public Item(String n, String m, int v, int q, boolean c) {
+	public Item(String n, String m, int v, int q, boolean c, int d) {
 		this.name = n;
 		this.model = m;
 		this.value = v;
 		this.quantity = q;
-		this.Consumable = c;
+		this.consumable = c;
+
+		if (c)this.date = 0; //consumable no date "y"
+
+		else this.date = date; // "n"
 	}
 
 	public String getName() {
@@ -45,18 +49,5 @@ public class Item {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-
-	
-	
-
-
-
-
-
-
-
-
-
-
 
 }
