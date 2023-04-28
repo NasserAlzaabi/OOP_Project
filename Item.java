@@ -6,11 +6,12 @@ public class Item {
 	protected int value, quantity;
 	boolean Consumable;
 	
-	public Item(String n, String m, int v, int q) {
+	public Item(String n, String m, int v, int q, boolean c) {
 		this.name = n;
 		this.model = m;
 		this.value = v;
 		this.quantity = q;
+		this.Consumable = c;
 	}
 
 	public String getName() {

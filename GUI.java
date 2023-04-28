@@ -18,7 +18,7 @@ import java.io.PrintWriter;
 
 public class GUI extends JFrame{
     private JFrame frame;
-    private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel,techPanel, techLoginPanel;
+    private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel,techPanel, techLoginPanel, inventoryPanel;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton,studentButton,technicianButton,RSButton,RSButton2;
@@ -34,6 +34,7 @@ public class GUI extends JFrame{
     ObjectInputStream in;
     ObjectOutputStream out;
     ArrayList<Student> students = new ArrayList<Student>();
+    static ArrayList<Item> inventory = new ArrayList<Item>(); //for tech to add new items and edit existing ones
 
     public GUI() throws FileNotFoundException{
         //general JFrame structure setup
@@ -48,9 +49,12 @@ public class GUI extends JFrame{
         successPanel = new JPanel();
         studentPanel = new JPanel();
         techPanel = new JPanel();
+        inventoryPanel = new JPanel();
         cardLayout = new CardLayout();
 
         ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
+        techHandler TH = new techHandler();
+
         RSButton = new JButton("Return to Selection");
         RSButton2 = new JButton("Return to Selection");
         studentButton = new JButton("Student");
@@ -62,7 +66,11 @@ public class GUI extends JFrame{
         signupButton = new JButton("Sign Up");
         
         exitButton = new JButton("Exit");
-        
+        iEnter = new JButton("Enter Item");
+        invReturn = new JButton("Back");
+        invDelete = new JButton("Delete Item");
+        invEdit = new JButton("Edit Item");
+
         RSButton.addActionListener(BH);
         RSButton2.addActionListener(BH);
         studentButton.addActionListener(BH);
@@ -73,6 +81,12 @@ public class GUI extends JFrame{
         exitButton.addActionListener(BH);
         submitLogin.addActionListener(BH);
         TsubmitLogin.addActionListener(BH);
+
+        inventoryButton.addActionListener(TH);
+        iEnter.addActionListener(TH);
+        invReturn.addActionListener(TH);
+        invDelete.addActionListener(TH);
+        invEdit.addActionListener(TH);
 
         for (int i = 0; i < 3; i++){ //creates 3 of the same button, all of them return to main screen
             returnButton[i] = new JButton("Return");
@@ -94,11 +108,13 @@ public class GUI extends JFrame{
         frame.add(successPanel, "successPanel");
         frame.add(studentPanel, "studentPanel");
         frame.add(techPanel, "techPanel");
-        frame.setSize(500,300);
+        frame.add(inventoryPanel, "InventoryPanel");
+        frame.setSize(500,500);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         frame.setVisible(true);
+        
         techOrStu();
         mainP();
         logIn();
@@ -107,6 +123,7 @@ public class GUI extends JFrame{
         successP();
         techP();
         studentP();
+        invP();
     }
 
     public void techOrStu(){
@@ -180,8 +197,36 @@ public class GUI extends JFrame{
 
     }
 
+    private JButton inventoryButton = new JButton("Inventory Panel");
+    
     public void techP(){ //panel after logging into tech
+        techPanel.setLayout(new GridLayout(5, 5));
+        techPanel.add(inventoryButton);
         techPanel.add(new JLabel("U are in tech panel"));
+    }
+
+    private JTextField iName, iModel, iValue, iQuantity, iConsumable;
+    private JButton iEnter, invReturn, invEdit, invDelete;
+
+    public void invP(){ //Panel for tech to add remove edit items
+
+        
+        inventoryPanel.setLayout(new GridLayout(9,2, 5, 5));
+        inventoryPanel.add(new JLabel("  Please enter all requested infor"));
+        inventoryPanel.add(invReturn);
+        inventoryPanel.add(new JLabel("  Item Name: "));
+        inventoryPanel.add(iName = new JTextField());
+        inventoryPanel.add(new JLabel("  Item Model: "));
+        inventoryPanel.add(iModel = new JTextField());
+        inventoryPanel.add(new JLabel("  Item Value"));
+        inventoryPanel.add(iValue = new JTextField());
+        inventoryPanel.add(new JLabel("  Quantity of Item: "));
+        inventoryPanel.add(iQuantity = new JTextField());
+        inventoryPanel.add(new JLabel("  Item Consumable (y/n):"));
+        inventoryPanel.add(iConsumable = new JTextField());
+        inventoryPanel.add(iEnter);
+        inventoryPanel.add(invDelete);
+        inventoryPanel.add(invEdit); //edit still work in progress
     }
 
     public void successP(){
@@ -230,12 +275,14 @@ public class GUI extends JFrame{
 
     //its in the name
     public void createNewStudent(String newID, String newName, String newPassword, String newPhoneNumber){
-        Student newStudent = new Student(newID, newName, newPassword, newPhoneNumber,"");
+        Student newStudent = new Student(newID, newName, newPassword, newPhoneNumber);
         students.add(newStudent);
     }
 
     final JLabel enterInfo = new JLabel("Enter all required information.");
     final JLabel incorrectLogin = new JLabel("Incorrect Name or Password");
+    final JLabel iAdded = new JLabel("Item Added");
+    final JLabel iDeleted = new JLabel("Item Deleted");
 
     class ButtonHandler implements ActionListener{
         public void actionPerformed(ActionEvent e){
@@ -248,7 +295,7 @@ public class GUI extends JFrame{
             if (e.getActionCommand().equals("Return to Selection")){
                 cardLayout.show(frame.getContentPane(), "TechOrStuPanel");
             }
-            if (e.getActionCommand().equals("Submit")){
+            if (e.getActionCommand().equals("Submit")){ //submiting signup for students
                 if ((studentInfo[0].getText().isEmpty() || studentInfo[1].getText().isEmpty()
                 || studentInfo[2].getText().isEmpty() || studentInfo[3].getText().isEmpty())){
                     signupPanel.add(enterInfo); 
@@ -287,4 +334,53 @@ public class GUI extends JFrame{
             }
         }
     }
+
+    private boolean cons;
+
+    public void addInventory(){ //checks if entered item information, saves it to inventory 
+        if (iName.getText().isEmpty() || iModel.getText().isEmpty() || iConsumable.getText().isEmpty()
+            || iQuantity.getText().isEmpty() || iValue.getText().isEmpty()){
+                inventoryPanel.remove(iAdded);
+                inventoryPanel.add(enterInfo); 
+                frame.setVisible(true);
+                    
+            }
+        else{
+            inventoryPanel.remove(enterInfo);
+            inventoryPanel.add(iAdded);
+            frame.setVisible(true);
+
+            if (iConsumable.equals("y"))
+                cons = true;
+            else // if another string is inputted it defaults to false
+                cons = false;
+            inventory.add(new Item(iName.getText(), iModel.getText(), Integer.parseInt(iValue.getText()), Integer.parseInt(iQuantity.getText()), cons));
+            iName.setText(""); iModel.setText(""); iValue.setText("");
+            iQuantity.setText(""); iConsumable.setText(""); //resets textfields
+        }
+    }
+
+    public void deleteItem(){
+        if (inventory.contains(iName.getText())){
+            inventory.remove(inventory.indexOf(iName.getText()));
+            iName.setText("");
+            inventoryPanel.remove(enterInfo);
+            inventoryPanel.remove(iAdded);
+            inventoryPanel.add(iDeleted);
+        }
+    }
+
+    class techHandler implements ActionListener{ //Seperate Handler for tech buttons and options, if item already exists it edits
+        public void actionPerformed(ActionEvent e){
+            if (e.getActionCommand().equals("Inventory Panel"))
+                cardLayout.show(frame.getContentPane(), "InventoryPanel");
+            if (e.getActionCommand().equals("Enter Item"))
+                addInventory();
+            if (e.getActionCommand().equals("Back"))
+                cardLayout.show(frame.getContentPane(), "techPanel");
+            if (e.getActionCommand().equals("Delete Item"));
+                deleteItem();
+        }
+    }
+    
 }
