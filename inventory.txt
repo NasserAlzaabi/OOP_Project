@@ -20,4 +20,10 @@ key 2020 300 3 y 04-05-2023
 90 234 456 234 y 45
 =======
 >>>>>>> Stashed changes
-resistors 121121 3 23 n
+resistors 121121 3 23 nballs b1212 1000 1 y 112211
+nasser nn11 200000 1 n 112233
+1 1 1 1 1 1
+4 2 12 1 5 3
+balling 131 46237991 293 n 421341
+hello WORLD 3638 1 n 123121
+nasser 2.0 2.0 1000000 321 n 421421

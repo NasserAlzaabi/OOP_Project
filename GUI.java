@@ -22,14 +22,17 @@ public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
     private JPanel techPanel, techLoginPanel, inventoryPanel, dashPanel, itemSearch;
+    private JPanel studentDashboardPanel;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton;
     private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch;
+    private JButton studentDashboardButton, studentDashboardBackButton, studentDashboardAddItem;
     private JTextField userText,TechText;
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
-    private JScrollPane itemScroll;
+    private JTextArea studentDashboardArea,studentDashboardBasket;
+    private JScrollPane itemScroll,studentDashboardScroll;
 
     PrintWriter pout;
     Technician tech = new Technician(); //technician
@@ -53,15 +56,23 @@ public class GUI extends JFrame{
         signupPanel = new JPanel();
         successPanel = new JPanel();
         studentPanel = new JPanel();
+        studentDashboardPanel = new JPanel();
         techPanel = new JPanel();
         inventoryPanel = new JPanel();
         dashPanel = new JPanel();
         itemSearch = new JPanel();
-        itemScroll = new JScrollPane(dashPanel);
         cardLayout = new CardLayout();
+
+
+        studentDashboardArea = new JTextArea(5,4);
+        studentDashboardScroll = new JScrollPane(studentDashboardArea);
+        itemScroll = new JScrollPane(dashPanel);
+
+        studentDashboardArea.setEditable(false);
 
         ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
         techHandler TH = new techHandler();
+        studentHandler SH = new studentHandler();
 
         RSButton = new JButton("Return to Selection");
         RSButton2 = new JButton("Return to Selection");
@@ -73,13 +84,15 @@ public class GUI extends JFrame{
         TsubmitLogin = new JButton("Enter");
         submitSignup = new JButton("Submit");
         signupButton = new JButton("Sign Up");
-        
         exitButton = new JButton("Exit");
         iEnter = new JButton("Enter Item");
         invReturn = new JButton("Back");
         invDelete = new JButton("Delete Item");
         invEdit = new JButton("Edit Item");
         iSearch = new JButton("Search");
+
+        studentDashboardButton = new JButton("Item Dashboard");
+        studentDashboardBackButton = new JButton("Back");
 
         RSButton.addActionListener(BH);
         RSButton2.addActionListener(BH);
@@ -102,6 +115,9 @@ public class GUI extends JFrame{
         iSearch.addActionListener(TH);
         enterItem.addActionListener(TH);
 
+        studentDashboardButton.addActionListener(SH);
+        studentDashboardBackButton.addActionListener(SH);
+
         for (int i = 0; i < 4; i++){ //creates 4 of the same button, all of them return to main screen
             returnButton[i] = new JButton("Return");
             returnButton[i].addActionListener(BH);
@@ -122,6 +138,7 @@ public class GUI extends JFrame{
         frame.add(signupPanel, "SignupPanel");
         frame.add(successPanel, "successPanel");
         frame.add(studentPanel, "studentPanel");
+        frame.add(studentDashboardPanel, "studentDashboardPanel");
         frame.add(techPanel, "techPanel");
         frame.add(inventoryPanel, "InventoryPanel");
         frame.add(itemScroll, "DashboardPanel"); 
@@ -142,6 +159,7 @@ public class GUI extends JFrame{
         successP();
         techP();
         studentP();
+        studentDashboardP();
         invP();
         dashP();
         searchP();
@@ -216,9 +234,15 @@ public class GUI extends JFrame{
     public void studentP(){ //panel after logging into student
         studentPanel.setLayout(new GridLayout(3,1));
         studentPanel.add(new JLabel("successful login"));
-        studentPanel.add(new JLabel("")); //item button for student (will work on soon)
+        studentPanel.add(studentDashboardButton);
         studentPanel.add(returnButton[3]);
+    }
 
+    public void studentDashboardP(){
+        studentDashboardPanel.setLayout(new GridLayout(3,1));
+        studentDashboardPanel.add(new JLabel("student item dashbaord"));
+        studentDashboardPanel.add(studentDashboardScroll);
+        studentDashboardPanel.add(studentDashboardBackButton);
     }
 
     private JButton inventoryButton = new JButton("Inventory Panel");
@@ -297,6 +321,14 @@ public class GUI extends JFrame{
         successPanel.add(new JLabel());
         successPanel.add(new JLabel("Press to return to login."));
         successPanel.add(returnButton[2]);
+    }
+
+    public void studentDashboardSetup(){
+        studentDashboardArea.append("Name \t Model# \t Value \t Quantity\n");
+        for (int i = 0; i < inventory.size(); i++){
+            studentDashboardArea.append(inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" +
+            inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\n");
+        }
     }
 
     public boolean checkLogin(String id, String password){//method that goes in file to check student data
@@ -465,6 +497,20 @@ public class GUI extends JFrame{
                 cardLayout.show(frame.getContentPane(), "iSearch");
             if (e.getActionCommand().equals("enterItem"))
                 searchItem();
+        }
+    }
+
+    class studentHandler implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            if (e.getActionCommand().equals("Item Dashboard")){
+                cardLayout.show(frame.getContentPane(), "studentDashboardPanel");
+                studentDashboardSetup(); //adds items to text area
+            }
+
+            if (e.getActionCommand().equals("Back")){
+                cardLayout.show(frame.getContentPane(), "studentPanel");
+                    studentDashboardArea.setText(""); //resets text area when you leave
+            }
         }
     }
 }
