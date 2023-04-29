@@ -2,20 +2,40 @@ package OOP_Project;
 
 public class Item {
 	
-	protected String name, model;
-	protected int value, quantity, date; //date :ddmmyy:
+	protected String name, model, date;
+	protected int value, quantity; //date :ddmmyy:
 	boolean consumable;
 	
-	public Item(String n, String m, int v, int q, boolean c, int d) {
+	public Item(String n, String m, int v, int q, boolean c, String d) {
 		this.name = n;
 		this.model = m;
 		this.value = v;
 		this.quantity = q;
 		this.consumable = c;
 
-		if (c)this.date = 0; //consumable no date "y"
+		if (c)this.date = ""; //consumable no date "y"
 
-		else this.date = date; // "n"
+		else this.date = d; // "n"
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public boolean isConsumable() {
+		return consumable;
+	}
+
+	public void setConsumable(boolean consumable) {
+		this.consumable = consumable;
+	}
+
+	public boolean getConsumable(){ 
+		return consumable;
 	}
 
 	public String getName() {

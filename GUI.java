@@ -21,11 +21,11 @@ import java.time.*;
 public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
-    private JPanel techPanel, techLoginPanel, inventoryPanel, dashPanel;
+    private JPanel techPanel, techLoginPanel, inventoryPanel, dashPanel, itemSearch;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton;
-    private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton;
+    private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch;
     private JTextField userText,TechText;
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
@@ -56,6 +56,7 @@ public class GUI extends JFrame{
         techPanel = new JPanel();
         inventoryPanel = new JPanel();
         dashPanel = new JPanel();
+        itemSearch = new JPanel();
         itemScroll = new JScrollPane(dashPanel);
         cardLayout = new CardLayout();
 
@@ -78,6 +79,7 @@ public class GUI extends JFrame{
         invReturn = new JButton("Back");
         invDelete = new JButton("Delete Item");
         invEdit = new JButton("Edit Item");
+        iSearch = new JButton("Search");
 
         RSButton.addActionListener(BH);
         RSButton2.addActionListener(BH);
@@ -97,6 +99,8 @@ public class GUI extends JFrame{
         invDelete.addActionListener(TH);
         invEdit.addActionListener(TH);
         itemDashButton.addActionListener(TH);
+        iSearch.addActionListener(TH);
+        enterItem.addActionListener(TH);
 
         for (int i = 0; i < 4; i++){ //creates 4 of the same button, all of them return to main screen
             returnButton[i] = new JButton("Return");
@@ -120,8 +124,8 @@ public class GUI extends JFrame{
         frame.add(studentPanel, "studentPanel");
         frame.add(techPanel, "techPanel");
         frame.add(inventoryPanel, "InventoryPanel");
-        frame.add(dashPanel, "DPanel");
         frame.add(itemScroll, "DashboardPanel"); 
+        frame.add(itemSearch, "iSearch");
         frame.setSize(500,350);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -140,6 +144,7 @@ public class GUI extends JFrame{
         studentP();
         invP();
         dashP();
+        searchP();
     }
 
     public void techOrStu(){
@@ -222,9 +227,9 @@ public class GUI extends JFrame{
     public void techP(){ //panel after logging into tech
         techPanel.setLayout(new GridLayout(5, 5));
         techPanel.add(inventoryButton);
-        techPanel.add(new JLabel(""));
         techPanel.add(techBackButton);
         techPanel.add(itemDashButton);
+        techPanel.add(iSearch);
     }
 
     private JTextField iName, iModel, iValue, iQuantity, iDate, iConsumable;
@@ -245,11 +250,35 @@ public class GUI extends JFrame{
         inventoryPanel.add(iQuantity = new JTextField());
         inventoryPanel.add(new JLabel("  Item Consumable (y/n):"));
         inventoryPanel.add(iConsumable = new JTextField());
-        inventoryPanel.add(new JLabel("  Item Date(ddmmyy): "));
+        inventoryPanel.add(new JLabel("  Item Date(dd-mm-yyyy): "));
         inventoryPanel.add(iDate = new JTextField());
         inventoryPanel.add(iEnter);
         inventoryPanel.add(invDelete);
         inventoryPanel.add(invEdit); //edit still work in progress
+    }
+
+    private JTextField itemS = new JTextField();
+    private JButton enterItem = new JButton("enterItem");
+
+    public void searchP(){
+        itemSearch.setLayout(new GridLayout(3,1, 5 ,5));
+        itemSearch.add(itemS);
+        itemSearch.add(enterItem);
+        itemSearch.add(iInfo);
+    }
+
+    final JLabel iInfo = new JLabel("");
+    public void searchItem(){
+        for (int i = 0; i < inventory.size(); i++){
+            if (inventory.get(i).getName().equals(itemS.getText())){
+                iInfo.setText((inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" + inventory.get(i).getQuantity()
+                + "\t" +  inventory.get(i).getValue() + "\t" + inventory.get(i).getDate() + "\t" + inventory.get(i).getConsumable()));
+                frame.setVisible(true);
+                break;
+            }
+            else
+                iInfo.setText("Item does not exist"); 
+        }
     }
 
     public void dashP(){
@@ -259,6 +288,7 @@ public class GUI extends JFrame{
         dashPanel.add(new JLabel("trsdfg"));
         dashPanel.revalidate(); dashPanel.repaint();
         getContentPane().add(itemScroll, BorderLayout.CENTER);
+        
     }
 
     public void successP(){
@@ -374,11 +404,11 @@ public class GUI extends JFrame{
 
     public void addInventory(){ //checks if entered item information, saves it to inventory 
         inventoryPanel.add(iLabel);
+        frame.setVisible(true);
         if (iName.getText().isEmpty() || iModel.getText().isEmpty() || iConsumable.getText().isEmpty()
             || iQuantity.getText().isEmpty() || iValue.getText().isEmpty() || iDate.getText().isEmpty()){
                 iLabel.setText("Enter all required information.");
-                inventoryPanel.add(iLabel); 
-                frame.setVisible(true);
+                
             }
         else{
             try{  //appends add item to inventory file
@@ -389,14 +419,14 @@ public class GUI extends JFrame{
             } catch (FileNotFoundException a) {a.printStackTrace();} 
             
             iLabel.setText("Item Added.");
-            frame.setVisible(true);
+            
 
-            if (iConsumable.equals("y"))
+            if (iConsumable.getText().equals("y"))
                 cons = true;
             else // if another string is inputted it defaults to false
                 cons = false;
             inventory.add(new Item(iName.getText(), iModel.getText(), Integer.parseInt(iValue.getText()),
-            Integer.parseInt(iQuantity.getText()), cons, Integer.parseInt(iDate.getText())));
+            Integer.parseInt(iQuantity.getText()), cons, iDate.getText()));
 
             iName.setText(""); iModel.setText(""); iValue.setText("");
             iQuantity.setText(""); iConsumable.setText(""); iDate.setText(""); //resets textfields
@@ -430,7 +460,11 @@ public class GUI extends JFrame{
             if (e.getActionCommand().equals("Delete Item"));
                 deleteItem();
             if (e.getActionCommand().equals("Dashboard"))
-                cardLayout.show(frame.getContentPane(), "DashboardPanel"); 
+                cardLayout.show(frame.getContentPane(), "DashboardPanel");
+            if (e.getActionCommand().equals("Search"))
+                cardLayout.show(frame.getContentPane(), "iSearch");
+            if (e.getActionCommand().equals("enterItem"))
+                searchItem();
         }
     }
 }
