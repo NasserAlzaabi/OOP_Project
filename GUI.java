@@ -16,11 +16,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.security.InvalidKeyException;
+import java.time.*;
 
 public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
-    private JPanel techPanel, techLoginPanel, inventoryPanel;
+    private JPanel techPanel, techLoginPanel, inventoryPanel, dashPanel;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton;
@@ -28,7 +29,8 @@ public class GUI extends JFrame{
     private JTextField userText,TechText;
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
-    
+    private JScrollPane itemScroll;
+
     PrintWriter pout;
     Technician tech = new Technician(); //technician
     private int studentCount = 0; //counts how many students signed up (for login)
@@ -53,6 +55,8 @@ public class GUI extends JFrame{
         studentPanel = new JPanel();
         techPanel = new JPanel();
         inventoryPanel = new JPanel();
+        dashPanel = new JPanel();
+        itemScroll = new JScrollPane(dashPanel);
         cardLayout = new CardLayout();
 
         ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
@@ -92,8 +96,9 @@ public class GUI extends JFrame{
         invReturn.addActionListener(TH);
         invDelete.addActionListener(TH);
         invEdit.addActionListener(TH);
+        itemDashButton.addActionListener(TH);
 
-        for (int i = 0; i < 4; i++){ //creates 3 of the same button, all of them return to main screen
+        for (int i = 0; i < 4; i++){ //creates 4 of the same button, all of them return to main screen
             returnButton[i] = new JButton("Return");
             returnButton[i].addActionListener(BH);
         }
@@ -103,6 +108,7 @@ public class GUI extends JFrame{
         passwordText = new JPasswordField();
         techPassword = new JPasswordField();
 
+        
         //adding components to different panels
         frame.setLayout(cardLayout);
         frame.add(techOrStuPanel,"TechOrStuPanel");
@@ -114,9 +120,13 @@ public class GUI extends JFrame{
         frame.add(studentPanel, "studentPanel");
         frame.add(techPanel, "techPanel");
         frame.add(inventoryPanel, "InventoryPanel");
-        frame.setSize(500,500);
+        frame.add(dashPanel, "DPanel");
+        frame.add(itemScroll, "DashboardPanel"); 
+        frame.setSize(500,350);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        
 
         frame.setVisible(true);
         
@@ -129,6 +139,7 @@ public class GUI extends JFrame{
         techP();
         studentP();
         invP();
+        dashP();
     }
 
     public void techOrStu(){
@@ -206,12 +217,14 @@ public class GUI extends JFrame{
     }
 
     private JButton inventoryButton = new JButton("Inventory Panel");
-    
+    private JButton itemDashButton = new JButton("Dashboard");
+
     public void techP(){ //panel after logging into tech
         techPanel.setLayout(new GridLayout(5, 5));
         techPanel.add(inventoryButton);
         techPanel.add(new JLabel(""));
         techPanel.add(techBackButton);
+        techPanel.add(itemDashButton);
     }
 
     private JTextField iName, iModel, iValue, iQuantity, iDate, iConsumable;
@@ -237,6 +250,15 @@ public class GUI extends JFrame{
         inventoryPanel.add(iEnter);
         inventoryPanel.add(invDelete);
         inventoryPanel.add(invEdit); //edit still work in progress
+    }
+
+    public void dashP(){
+        //dashPanel.setLayout(new GridLayout(3, 2, 5, 5));
+        
+        
+        dashPanel.add(new JLabel("trsdfg"));
+        dashPanel.revalidate(); dashPanel.repaint();
+        getContentPane().add(itemScroll, BorderLayout.CENTER);
     }
 
     public void successP(){
@@ -291,8 +313,8 @@ public class GUI extends JFrame{
 
     final JLabel enterInfo = new JLabel("Enter all required information.");
     final JLabel incorrectLogin = new JLabel("Incorrect Name or Password");
-    final JLabel iAdded = new JLabel("Item Added");
-    final JLabel iDeleted = new JLabel("Item Deleted");
+    final JLabel iLabel = new JLabel("Item Added");
+    
 
     class ButtonHandler implements ActionListener{
         public void actionPerformed(ActionEvent e){
@@ -351,10 +373,11 @@ public class GUI extends JFrame{
     private boolean cons;
 
     public void addInventory(){ //checks if entered item information, saves it to inventory 
+        inventoryPanel.add(iLabel);
         if (iName.getText().isEmpty() || iModel.getText().isEmpty() || iConsumable.getText().isEmpty()
             || iQuantity.getText().isEmpty() || iValue.getText().isEmpty() || iDate.getText().isEmpty()){
-                inventoryPanel.remove(iAdded);
-                inventoryPanel.add(enterInfo); 
+                iLabel.setText("Enter all required information.");
+                inventoryPanel.add(iLabel); 
                 frame.setVisible(true);
             }
         else{
@@ -364,8 +387,8 @@ public class GUI extends JFrame{
                 iQuantity.getText() + " " + iConsumable.getText() + " " + iDate.getText() + "\n");
                 pout.close();
             } catch (FileNotFoundException a) {a.printStackTrace();} 
-            inventoryPanel.remove(enterInfo);
-            inventoryPanel.add(iAdded);
+            
+            iLabel.setText("Item Added.");
             frame.setVisible(true);
 
             if (iConsumable.equals("y"))
@@ -381,13 +404,19 @@ public class GUI extends JFrame{
     }
 
     public void deleteItem(){
-        if (inventory.contains(iName.getText())){
-            inventory.remove(inventory.indexOf(iName.getText()));
-            iName.setText("");
-            inventoryPanel.remove(enterInfo);
-            inventoryPanel.remove(iAdded);
-            inventoryPanel.add(iDeleted);
+        
+
+        for (int i = 0; i < inventory.size(); i++){
+            if (inventory.get(i).getName().equals(iName.getText())){
+                inventory.get(i).setQuantity(0);
+                iLabel.setText("Item Deleted");
+                frame.setVisible(true);
+                break;
+            }
         }
+
+        iName.setText("");
+        
     }
 
     class techHandler implements ActionListener{ //Seperate Handler for tech buttons and options, if item already exists it edits
@@ -400,6 +429,8 @@ public class GUI extends JFrame{
                 cardLayout.show(frame.getContentPane(), "techPanel");
             if (e.getActionCommand().equals("Delete Item"));
                 deleteItem();
+            if (e.getActionCommand().equals("Dashboard"))
+                cardLayout.show(frame.getContentPane(), "DashboardPanel"); 
         }
     }
 }
