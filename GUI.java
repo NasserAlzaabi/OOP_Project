@@ -22,17 +22,18 @@ public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
     private JPanel techPanel, techLoginPanel, inventoryPanel, dashPanel, itemSearch;
-    private JPanel studentDashboardPanel;
+    private JPanel studentDashboardPanel,studentDashboardBasketPanel;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton;
     private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch;
-    private JButton studentDashboardButton, studentDashboardBackButton, studentDashboardAddItem;
+    private JButton studentDashboardButton, studentDashboardBackButton;
+    private JButton studentDashboardBasketAdd, studentDashboardBasketReview, studentDashboardBasketBack;
     private JTextField userText,TechText;
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
-    private JTextArea studentDashboardArea,studentDashboardBasket;
-    private JScrollPane itemScroll,studentDashboardScroll;
+    private JTextArea studentDashboardArea, studentDashboardBasket;
+    private JScrollPane itemScroll, studentDashboardScroll, studentDashboardBasketScroll;
 
     PrintWriter pout;
     Technician tech = new Technician(); //technician
@@ -57,18 +58,22 @@ public class GUI extends JFrame{
         successPanel = new JPanel();
         studentPanel = new JPanel();
         studentDashboardPanel = new JPanel();
+        studentDashboardBasketPanel = new JPanel();
         techPanel = new JPanel();
         inventoryPanel = new JPanel();
         dashPanel = new JPanel();
         itemSearch = new JPanel();
         cardLayout = new CardLayout();
 
-
+        //text area convert to scroll pane
         studentDashboardArea = new JTextArea(5,4);
+        studentDashboardBasket = new JTextArea(5,4);
         studentDashboardScroll = new JScrollPane(studentDashboardArea);
-        itemScroll = new JScrollPane(dashPanel);
+        studentDashboardBasketScroll = new JScrollPane(studentDashboardBasket);
+        itemScroll = new JScrollPane(dashPanel); 
 
         studentDashboardArea.setEditable(false);
+        studentDashboardBasket.setEditable(false);
 
         ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
         techHandler TH = new techHandler();
@@ -91,8 +96,14 @@ public class GUI extends JFrame{
         invEdit = new JButton("Edit Item");
         iSearch = new JButton("Search");
 
+
+        //studentDashboard buttons
         studentDashboardButton = new JButton("Item Dashboard");
+        studentDashboardBasketAdd = new JButton ("Add to Basket");
+        studentDashboardBasketReview = new JButton("Review Basket");
         studentDashboardBackButton = new JButton("Back");
+        studentDashboardBasketBack = new JButton("Return to Dashboard");
+        
 
         RSButton.addActionListener(BH);
         RSButton2.addActionListener(BH);
@@ -117,6 +128,9 @@ public class GUI extends JFrame{
 
         studentDashboardButton.addActionListener(SH);
         studentDashboardBackButton.addActionListener(SH);
+        studentDashboardBasketAdd.addActionListener(SH);
+        studentDashboardBasketReview.addActionListener(SH);
+        studentDashboardBasketBack.addActionListener(SH);
 
         for (int i = 0; i < 4; i++){ //creates 4 of the same button, all of them return to main screen
             returnButton[i] = new JButton("Return");
@@ -139,11 +153,13 @@ public class GUI extends JFrame{
         frame.add(successPanel, "successPanel");
         frame.add(studentPanel, "studentPanel");
         frame.add(studentDashboardPanel, "studentDashboardPanel");
+        frame.add(studentDashboardBasketPanel, "studentDashboardBasketPanel");
         frame.add(techPanel, "techPanel");
         frame.add(inventoryPanel, "InventoryPanel");
         frame.add(itemScroll, "DashboardPanel"); 
         frame.add(itemSearch, "iSearch");
-        frame.setSize(500,350);
+        frame.setSize(1000,650);
+        
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -160,6 +176,7 @@ public class GUI extends JFrame{
         techP();
         studentP();
         studentDashboardP();
+        studentDashboardBasketP();
         invP();
         dashP();
         searchP();
@@ -238,11 +255,31 @@ public class GUI extends JFrame{
         studentPanel.add(returnButton[3]);
     }
 
-    public void studentDashboardP(){
-        studentDashboardPanel.setLayout(new GridLayout(3,1));
-        studentDashboardPanel.add(new JLabel("student item dashbaord"));
+    JTextField studentIName, studentIQuantity, studentIDate;
+    JLabel studentNotifLabel;
+
+    public void studentDashboardP(){ 
+        studentDashboardPanel.setLayout(new GridLayout(6,2));
+        studentDashboardPanel.add(new JLabel("Item dashbaord"));
         studentDashboardPanel.add(studentDashboardScroll);
+        studentDashboardPanel.add(new JLabel("Item Name: "));
+        studentDashboardPanel.add(studentIName = new JTextField(""));
+        studentDashboardPanel.add(new JLabel("Item Quantity: "));
+        studentDashboardPanel.add(studentIQuantity = new JTextField());
+        studentDashboardPanel.add(new JLabel("Return Date (dd-mm-yyyy): "));
+        studentDashboardPanel.add(studentIDate = new JTextField());
+        studentDashboardPanel.add(studentNotifLabel = new JLabel("")); //item not found or, item add and so on (idk how to do this)
+        studentDashboardPanel.add(studentDashboardBasketAdd);
         studentDashboardPanel.add(studentDashboardBackButton);
+        studentDashboardPanel.add(studentDashboardBasketReview);
+
+    }
+
+    public void studentDashboardBasketP(){
+        studentDashboardBasketPanel.setLayout(new GridLayout(6,2));
+        studentDashboardBasketPanel.add(new JLabel("Review Basket"));
+        studentDashboardBasketPanel.add(studentDashboardBasket);
+        studentDashboardBasketPanel.add(studentDashboardBasketBack);
     }
 
     private JButton inventoryButton = new JButton("Inventory Panel");
@@ -323,11 +360,34 @@ public class GUI extends JFrame{
         successPanel.add(returnButton[2]);
     }
 
-    public void studentDashboardSetup(){
+    public void studentDashboardSetup(){ //sets up the look of the dashboard text area
         studentDashboardArea.append("Name \t Model# \t Value \t Quantity\n");
         for (int i = 0; i < inventory.size(); i++){
             studentDashboardArea.append(inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" +
             inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\n");
+        }
+    }
+
+    public void studentDashboardBasketSetup(){
+        studentDashboardBasket.append("Name \t Quantity\n");
+    }
+
+    JLabel emptyAddLabel = new JLabel("Please provide Information");
+    JLabel incorrectAddLabel = new JLabel("Incorrect Information");
+    JLabel basketAddLabel = new JLabel("Item added to basket");
+
+    public void studentBasketAddItem(){
+
+        if (studentIName.getText().isEmpty() || studentIQuantity.getText().isEmpty() || studentIDate.getText().isEmpty()){
+            studentNotifLabel.setText("Please provide Information");
+        }
+        else{
+            for (int i = 0; i<inventory.size(); i++){
+                if (studentIName.getText().equals(inventory.get(i).getName()) && Integer.parseInt(studentIQuantity.getText()) <= inventory.get(i).getQuantity()){
+                    //appends text to the basket text area located in basket review
+                    studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\t" + studentIDate.getText() + "\n");
+                }
+            }
         }
     }
 
@@ -505,11 +565,21 @@ public class GUI extends JFrame{
             if (e.getActionCommand().equals("Item Dashboard")){
                 cardLayout.show(frame.getContentPane(), "studentDashboardPanel");
                 studentDashboardSetup(); //adds items to text area
+                studentDashboardBasketSetup();
             }
-
             if (e.getActionCommand().equals("Back")){
                 cardLayout.show(frame.getContentPane(), "studentPanel");
-                    studentDashboardArea.setText(""); //resets text area when you leave
+                studentDashboardArea.setText(""); //resets text area when you leave
+                studentDashboardBasket.setText("");
+            }
+            if (e.getActionCommand().equals("Review Basket")){
+                cardLayout.show(frame.getContentPane(), "studentDashboardBasketPanel");
+            }
+            if (e.getActionCommand().equals("Add to Basket")){
+                studentBasketAddItem();
+            } 
+            if (e.getActionCommand().equals("Return to Dashboard")){
+                cardLayout.show(frame.getContentPane(), "studentDashboardPanel");
             }
         }
     }
