@@ -45,6 +45,7 @@ public class GUI extends JFrame{
     ObjectOutputStream out;
     ArrayList<Student> students = new ArrayList<Student>();
     ArrayList<Item> inventory = new ArrayList<Item>(); //for tech to add new items and edit existing ones
+    ArrayList<Item> basket; //new, what the student takes
 
     public GUI() throws FileNotFoundException{
         //general JFrame structure setup
