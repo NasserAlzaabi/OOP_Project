@@ -19,7 +19,15 @@ class Student extends User{
 		this.items = BorrowedItems;
 	}
 
+	public void addItem(Item item){ //new method 
+		items.add(item);
+	}
+
+	public void removeItem(Item item){ //new method
+		items.remove(item); 
+	}
+
 	// public String sendItemRequest(){
-		
+	// 	//
 	// }
 }
