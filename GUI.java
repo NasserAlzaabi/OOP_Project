@@ -22,12 +22,12 @@ public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
     private JPanel techPanel, techLoginPanel, inventoryPanel, itemSearch;
-    private JPanel studentDashboardPanel,studentDashboardBasketPanel, techDash;
+    private JPanel studentDashboardPanel,studentDashboardBasketPanel, techDash, studentItemSearch;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton;
-    private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch;
-    private JButton studentDashboardButton, studentDashboardBackButton;
+    private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch, iSearchBack, studentISearchBack;
+    private JButton studentDashboardButton, studentDashboardBackButton, studentISearchButton;
     private JButton studentDashboardBasketAdd, studentDashboardBasketReview, studentDashboardBasketBack;
     private JButton studentDashboardSendRequest, studentDashboardEditAdd, studentDashboardEditRemove; //new JButton
     private JTextField userText,TechText;
@@ -45,7 +45,7 @@ public class GUI extends JFrame{
     ObjectOutputStream out;
     ArrayList<Student> students = new ArrayList<Student>();
     ArrayList<Item> inventory = new ArrayList<Item>(); //for tech to add new items and edit existing ones
-    ArrayList<Item> basket; //new, what the student takes
+    ArrayList<Item> basket = new ArrayList<Item>(); //new, what the student takes
 
     public GUI() throws FileNotFoundException{
         //general JFrame structure setup
@@ -65,6 +65,7 @@ public class GUI extends JFrame{
         inventoryPanel = new JPanel();
         itemSearch = new JPanel();
         techDash = new JPanel();
+        studentItemSearch = new JPanel();
         cardLayout = new CardLayout();
 
         //text area convert to scroll pane
@@ -98,11 +99,15 @@ public class GUI extends JFrame{
         invDelete = new JButton("Delete Item");
         invEdit = new JButton("Edit Item");
         iSearch = new JButton("Search");
+        iSearchBack = new JButton("Go Back");
 
         for (int i = 0; i < 4; i++){
             invReturn[i] = new JButton("Back");
             invReturn[i].addActionListener(TH);
         }
+
+        studentISearchButton = new JButton("Search");
+        studentISearchBack = new JButton("Go Back");
 
         //studentDashboard buttons
         studentDashboardButton = new JButton("Item Dashboard");
@@ -134,7 +139,11 @@ public class GUI extends JFrame{
         itemDashButton.addActionListener(TH);
         iSearch.addActionListener(TH);
         enterItem.addActionListener(TH);
+        iSearchBack.addActionListener(TH);
 
+        studentEnterItem.addActionListener(SH);
+        studentISearchButton.addActionListener(SH);
+        studentISearchBack.addActionListener(SH);
         studentDashboardButton.addActionListener(SH);
         studentDashboardBackButton.addActionListener(SH);
         studentDashboardBasketAdd.addActionListener(SH);
@@ -170,6 +179,7 @@ public class GUI extends JFrame{
         frame.add(inventoryPanel, "InventoryPanel"); 
         frame.add(itemSearch, "iSearch");
         frame.add(techDash, "DashboardPanel");
+        frame.add(studentItemSearch, "studentItemSearch");
         frame.setSize(1000,650);
         
         frame.setLocationRelativeTo(null);
@@ -191,6 +201,7 @@ public class GUI extends JFrame{
         studentDashboardBasketP();
         invP();
         searchP();
+        studentSearchP();
     }
 
     public void techOrStu(){
@@ -263,7 +274,33 @@ public class GUI extends JFrame{
         studentPanel.setLayout(new GridLayout(3,1));
         studentPanel.add(new JLabel("successful login"));
         studentPanel.add(studentDashboardButton);
+        studentPanel.add(studentISearchButton);
         studentPanel.add(returnButton[3]);
+    }
+
+    private JTextField studentItemS= new JTextField();
+    private JButton studentEnterItem = new JButton("Enter Item");
+
+    public void studentSearchP(){
+        studentItemSearch.setLayout(new GridLayout(3, 1));
+        studentItemSearch.add(studentItemS);
+        studentItemSearch.add(studentEnterItem);
+        studentItemSearch.add(studentInfoLabel);
+        studentItemSearch.add(studentISearchBack);
+    }
+
+    final JLabel studentInfoLabel = new JLabel("");
+    public void studentSearchItem(){
+        for (int i = 0; i < inventory.size(); i++){
+            if (inventory.get(i).getName().equals(studentItemS.getText())){
+                studentInfoLabel.setText((inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" + inventory.get(i).getQuantity()
+                + "\t" +  inventory.get(i).getValue() + "\t" + inventory.get(i).getDate() + "\t" + inventory.get(i).getConsumable()));
+                frame.setVisible(true);
+                break;
+            }
+            else
+                studentInfoLabel.setText("Item does not exist"); 
+        }
     }
 
     JTextField studentIName, studentIQuantity, studentItemSelect; //studentItemSelect new attribute
@@ -340,6 +377,7 @@ public class GUI extends JFrame{
         itemSearch.add(itemS);
         itemSearch.add(enterItem);
         itemSearch.add(iInfo);
+        itemSearch.add(iSearchBack);
     }
 
     final JLabel iInfo = new JLabel("");
@@ -613,6 +651,10 @@ public class GUI extends JFrame{
                 searchItem();
             if (e.getActionCommand().equals("Edit Item"))
                 editItem();
+            if (e.getActionCommand().equals("Go Back")){
+                cardLayout.show(frame.getContentPane(), "techPanel");
+            }
+
         }
     }
 
@@ -627,6 +669,15 @@ public class GUI extends JFrame{
                 cardLayout.show(frame.getContentPane(), "studentPanel");
                 studentDashboardArea.setText(""); //resets text area when you leave
                 studentDashboardBasket.setText("");
+            }
+            if (e.getActionCommand().equals("Search")){
+                cardLayout.show(frame.getContentPane(), "studentItemSearch");
+            }
+            if (e.getActionCommand().equals("Enter Item")){
+                studentSearchItem();
+            }
+            if (e.getActionCommand().equals("Go Back")){
+                cardLayout.show(frame.getContentPane(), "studentPanel");
             }
             if (e.getActionCommand().equals("Review Basket")){
                 cardLayout.show(frame.getContentPane(), "studentDashboardBasketPanel");

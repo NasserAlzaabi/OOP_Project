@@ -27,6 +27,13 @@ class Student extends User{
 		items.remove(item); 
 	}
 
+	public void setItems(ArrayList<Item> newItems){ //new method
+		this.items = newItems;
+	}
+
+	public ArrayList<Item> getItems(){
+		return this.items;
+	}
 	// public String sendItemRequest(){
 	// 	//
 	// }
