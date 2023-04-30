@@ -21,8 +21,8 @@ import java.time.*;
 public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
-    private JPanel techPanel, techLoginPanel, inventoryPanel, dashPanel, itemSearch;
-    private JPanel studentDashboardPanel,studentDashboardBasketPanel;
+    private JPanel techPanel, techLoginPanel, inventoryPanel, itemSearch;
+    private JPanel studentDashboardPanel,studentDashboardBasketPanel, techDash;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton;
@@ -32,7 +32,7 @@ public class GUI extends JFrame{
     private JTextField userText,TechText;
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
-    private JTextArea studentDashboardArea, studentDashboardBasket;
+    private JTextArea studentDashboardArea, studentDashboardBasket, dashPanel;
     private JScrollPane itemScroll, studentDashboardScroll, studentDashboardBasketScroll;
 
     PrintWriter pout;
@@ -43,7 +43,7 @@ public class GUI extends JFrame{
     ObjectInputStream in;
     ObjectOutputStream out;
     ArrayList<Student> students = new ArrayList<Student>();
-    static ArrayList<Item> inventory = new ArrayList<Item>(); //for tech to add new items and edit existing ones
+    ArrayList<Item> inventory = new ArrayList<Item>(); //for tech to add new items and edit existing ones
 
     public GUI() throws FileNotFoundException{
         //general JFrame structure setup
@@ -61,8 +61,8 @@ public class GUI extends JFrame{
         studentDashboardBasketPanel = new JPanel();
         techPanel = new JPanel();
         inventoryPanel = new JPanel();
-        dashPanel = new JPanel();
         itemSearch = new JPanel();
+        techDash = new JPanel();
         cardLayout = new CardLayout();
 
         //text area convert to scroll pane
@@ -70,10 +70,12 @@ public class GUI extends JFrame{
         studentDashboardBasket = new JTextArea(5,4);
         studentDashboardScroll = new JScrollPane(studentDashboardArea);
         studentDashboardBasketScroll = new JScrollPane(studentDashboardBasket);
+        dashPanel = new JTextArea();
         itemScroll = new JScrollPane(dashPanel); 
 
         studentDashboardArea.setEditable(false);
         studentDashboardBasket.setEditable(false);
+        dashPanel.setEditable(false);
 
         ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
         techHandler TH = new techHandler();
@@ -91,11 +93,14 @@ public class GUI extends JFrame{
         signupButton = new JButton("Sign Up");
         exitButton = new JButton("Exit");
         iEnter = new JButton("Enter Item");
-        invReturn = new JButton("Back");
         invDelete = new JButton("Delete Item");
         invEdit = new JButton("Edit Item");
         iSearch = new JButton("Search");
 
+        for (int i = 0; i < 4; i++){
+            invReturn[i] = new JButton("Back");
+            invReturn[i].addActionListener(TH);
+        }
 
         //studentDashboard buttons
         studentDashboardButton = new JButton("Item Dashboard");
@@ -119,7 +124,6 @@ public class GUI extends JFrame{
 
         inventoryButton.addActionListener(TH);
         iEnter.addActionListener(TH);
-        invReturn.addActionListener(TH);
         invDelete.addActionListener(TH);
         invEdit.addActionListener(TH);
         itemDashButton.addActionListener(TH);
@@ -155,9 +159,9 @@ public class GUI extends JFrame{
         frame.add(studentDashboardPanel, "studentDashboardPanel");
         frame.add(studentDashboardBasketPanel, "studentDashboardBasketPanel");
         frame.add(techPanel, "techPanel");
-        frame.add(inventoryPanel, "InventoryPanel");
-        frame.add(itemScroll, "DashboardPanel"); 
+        frame.add(inventoryPanel, "InventoryPanel"); 
         frame.add(itemSearch, "iSearch");
+        frame.add(techDash, "DashboardPanel");
         frame.setSize(1000,650);
         
         frame.setLocationRelativeTo(null);
@@ -178,7 +182,6 @@ public class GUI extends JFrame{
         studentDashboardP();
         studentDashboardBasketP();
         invP();
-        dashP();
         searchP();
     }
 
@@ -294,13 +297,14 @@ public class GUI extends JFrame{
     }
 
     private JTextField iName, iModel, iValue, iQuantity, iDate, iConsumable;
-    private JButton iEnter, invReturn, invEdit, invDelete;
+    private JButton iEnter, invEdit, invDelete;
+    private JButton[] invReturn = new JButton[4];
 
     public void invP(){ //Panel for tech to add remove edit items
 
         inventoryPanel.setLayout(new GridLayout(9,2, 5, 5));
         inventoryPanel.add(new JLabel("  Please enter all requested infor"));
-        inventoryPanel.add(invReturn);
+        inventoryPanel.add(invReturn[0]);
         inventoryPanel.add(new JLabel("  Item Name: "));
         inventoryPanel.add(iName = new JTextField());
         inventoryPanel.add(new JLabel("  Item Model: "));
@@ -343,12 +347,16 @@ public class GUI extends JFrame{
     }
 
     public void dashP(){
-        //dashPanel.setLayout(new GridLayout(3, 2, 5, 5));
         
-        
-        dashPanel.add(new JLabel("trsdfg"));
-        dashPanel.revalidate(); dashPanel.repaint();
-        getContentPane().add(itemScroll, BorderLayout.CENTER);
+        techDash.setLayout(new GridLayout(2,1,5,5));
+        techDash.add(itemScroll);
+        dashPanel.append("Name \t Model# \t Value \t Quantity\n");
+        techDash.add(invReturn[1]);
+
+        for (int i = 0; i < inventory.size(); i++){
+            dashPanel.append(inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" +
+            inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\n");
+        }
         
     }
 
@@ -541,22 +549,42 @@ public class GUI extends JFrame{
         
     }
 
+    public void editItem(){
+        for (int i = 0; i < inventory.size(); i++){
+            if (inventory.get(i).getName().equals(iName.getText())){
+                boolean b = false;
+                if (iConsumable.getText().equals("y")) b = true;
+                iLabel.setText("Edited " + iName.getText());
+                inventory.get(i).setModel(iModel.getText());
+                inventory.get(i).setValue(Integer.parseInt(iValue.getText()));
+                inventory.get(i).setDate(iDate.getText());
+                inventory.get(i).setConsumable(b);
+                inventory.get(i).setQuantity(Integer.parseInt(iQuantity.getText()));
+                break;
+            }
+            else 
+                iLabel.setText("Item does not exist");
+        }
+    }
+
     class techHandler implements ActionListener{ //Seperate Handler for tech buttons and options, if item already exists it edits
         public void actionPerformed(ActionEvent e){
             if (e.getActionCommand().equals("Inventory Panel"))
                 cardLayout.show(frame.getContentPane(), "InventoryPanel");
             if (e.getActionCommand().equals("Enter Item"))
                 addInventory();
-            if (e.getActionCommand().equals("Back"))
-                cardLayout.show(frame.getContentPane(), "techPanel");
+            if (e.getActionCommand().equals("Back")){
+                cardLayout.show(frame.getContentPane(), "techPanel"); dashPanel.setText(""); }
             if (e.getActionCommand().equals("Delete Item"));
                 deleteItem();
-            if (e.getActionCommand().equals("Dashboard"))
-                cardLayout.show(frame.getContentPane(), "DashboardPanel");
+            if (e.getActionCommand().equals("Dashboard")){
+                dashP(); cardLayout.show(frame.getContentPane(), "DashboardPanel"); }
             if (e.getActionCommand().equals("Search"))
                 cardLayout.show(frame.getContentPane(), "iSearch");
             if (e.getActionCommand().equals("enterItem"))
                 searchItem();
+            if (e.getActionCommand().equals("Edit Item"))
+                editItem();
         }
     }
 
