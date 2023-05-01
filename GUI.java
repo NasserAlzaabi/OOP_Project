@@ -29,7 +29,7 @@ public class GUI extends JFrame{
     private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch, iSearchBack, studentISearchBack;
     private JButton studentDashboardButton, studentDashboardBackButton, studentISearchButton;
     private JButton studentDashboardBasketAdd, studentDashboardBasketReview, studentDashboardBasketBack;
-    private JButton studentDashboardSendRequest, studentDashboardEditAdd, studentDashboardEditRemove; //new JButton
+    private JButton studentDashboardSendRequest, studentDashboardEditAdd, studentDashboardEditReduce; //new JButton
     private JTextField userText,TechText;
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
@@ -117,7 +117,7 @@ public class GUI extends JFrame{
         studentDashboardBasketBack = new JButton("Return to Dashboard");
         studentDashboardSendRequest = new JButton("Send Request");
         studentDashboardEditAdd = new JButton("+1");
-        studentDashboardEditRemove = new JButton("-1"); 
+        studentDashboardEditReduce = new JButton("-1"); 
         
 
         RSButton.addActionListener(BH);
@@ -151,7 +151,7 @@ public class GUI extends JFrame{
         studentDashboardBasketBack.addActionListener(SH);
         studentDashboardSendRequest.addActionListener(SH);
         studentDashboardEditAdd.addActionListener(SH);
-        studentDashboardEditRemove.addActionListener(SH);
+        studentDashboardEditReduce.addActionListener(SH);
 
         for (int i = 0; i < 4; i++){ //creates 4 of the same button, all of them return to main screen
             returnButton[i] = new JButton("Return");
@@ -327,7 +327,7 @@ public class GUI extends JFrame{
         studentDashboardBasketPanel.add(new JLabel("Enter Item To Edit: "));
         studentDashboardBasketPanel.add(studentItemSelect = new JTextField());
         studentDashboardBasketPanel.add(studentDashboardEditAdd);
-        studentDashboardBasketPanel.add(studentDashboardEditRemove);
+        studentDashboardBasketPanel.add(studentDashboardEditReduce);
         studentDashboardBasketPanel.add(studentDashboardSendRequest);
         studentDashboardBasketPanel.add(studentDashboardBasketBack);
     }
@@ -429,14 +429,18 @@ public class GUI extends JFrame{
     }
 
     public void studentBasketAddItem(){
-
+        int oQuantity = 0;
         if (studentIName.getText().isEmpty() || studentIQuantity.getText().isEmpty()){
             studentNotifLabel.setText("Please provide Information");
         }
         else{
             for (int i = 0; i<inventory.size(); i++){
-                if (studentIName.getText().equals(inventory.get(i).getName()) && Integer.parseInt(studentIQuantity.getText()) <= inventory.get(i).getQuantity()){
+                if (studentIName.getText().equals(inventory.get(i).getName()) && (Integer.parseInt(studentIQuantity.getText()) <= inventory.get(i).getQuantity())){
                     //appends text to the basket text area located in basket review
+                    oQuantity = inventory.get(i).getQuantity();
+                    basket.add(inventory.get(i));
+                    inventory.get(i).setQuantity(oQuantity);
+                    basket.get(i).setQuantity(Integer.parseInt(studentIQuantity.getText()));
                     studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\n");
                 }
             }
@@ -444,6 +448,38 @@ public class GUI extends JFrame{
     }
 
     public void studentItemQuantityAdd(){
+        int newQuantity = 0;
+        int maxQuantity = 0;
+        int nameIndex = 0;
+        if (studentItemSelect.getText().isEmpty()){
+            System.out.print("empty");
+        }
+        else{
+            for(int i = 0; i<inventory.size(); i++){
+                if (studentItemSelect.getText().equals(inventory.get(i).getName())){
+                    nameIndex = i;
+                    maxQuantity = inventory.get(i).getQuantity();
+                    System.out.print(maxQuantity);
+                }
+            }
+            newQuantity = 1 + inventory.get(nameIndex).getQuantity();
+            if (newQuantity <= maxQuantity){
+                basket.get(nameIndex).setQuantity(newQuantity);
+                studentDashboardBasket.setText("");
+                studentDashboardBasket.append("Name \t Quantity\n");
+                for (int i = 0; i<basket.size(); i++){
+                    if (i!=nameIndex){
+                        studentDashboardBasket.append(basket.get(i).getName() + "\t" + basket.get(i).getQuantity() + "\n");
+                    }
+                }
+                studentDashboardBasket.append(basket.get(nameIndex).getName() + "\t" + basket.get(nameIndex).getQuantity() + "\n");
+            }
+            
+        }
+
+    }
+
+    public void studentItemQuantityReduce(){
         int newQuantity = 0;
         int nameIndex = 0;
         if (studentItemSelect.getText().isEmpty()){
@@ -455,11 +491,20 @@ public class GUI extends JFrame{
                     nameIndex = i;
                 }
             }
-            newQuantity = 1 + inventory.get(nameIndex).getQuantity();
-            inventory.get(nameIndex).setQuantity(newQuantity);
-            studentDashboardBasket.append(inventory.get(nameIndex).getName() + "\t" + inventory.get(nameIndex).getQuantity() + "\n");
-        }
-    }
+            newQuantity = inventory.get(nameIndex).getQuantity() - 1;
+            if (newQuantity>=0){
+                basket.get(nameIndex).setQuantity(newQuantity);
+                studentDashboardBasket.setText("");
+                studentDashboardBasket.append("Name \t Quantity\n");
+                for (int i = 0; i<basket.size(); i++){
+                    if (i!=nameIndex){
+                        studentDashboardBasket.append(basket.get(i).getName() + "\t" + basket.get(i).getQuantity() + "\n");
+                    }
+                }
+                studentDashboardBasket.append(basket.get(nameIndex).getName() + "\t" + basket.get(nameIndex).getQuantity() + "\n");
+            }
+            
+        }    }
 
     
 
@@ -692,7 +737,7 @@ public class GUI extends JFrame{
                 studentItemQuantityAdd();
             }
             if (e.getActionCommand().equals("-1")){
-                //
+                studentItemQuantityReduce();   
             }
             if (e.getActionCommand().equals("Send Request")){
                 //
