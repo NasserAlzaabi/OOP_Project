@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -186,7 +187,7 @@ public class GUI extends JFrame{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         
-
+        getInventoryFromFile();
         frame.setVisible(true);
         
         techOrStu();
@@ -420,7 +421,8 @@ public class GUI extends JFrame{
         studentDashboardArea.append("Name \t Model# \t Value \t Quantity\n");
         for (int i = 0; i < inventory.size(); i++){
             studentDashboardArea.append(inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" +
-            inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\n");
+            inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\t" + inventory.get(i).getConsumable()
+            + "\t" + inventory.get(i).getDate() + "\n");
         }
     }
 
@@ -435,12 +437,14 @@ public class GUI extends JFrame{
         else{
             for (int i = 0; i<inventory.size(); i++){
                 if (studentIName.getText().equals(inventory.get(i).getName()) && (Integer.parseInt(studentIQuantity.getText()) <= inventory.get(i).getQuantity())){
-                    basket.get(i).setName(inventory.get(i).getName());
-                    basket.get(i).setModel(inventory.get(i).getModel());
-                    basket.get(i).setValue(inventory.get(i).getValue());
-                    basket.get(i).setDate(inventory.get(i).getDate());
-                    basket.get(i).setConsumable(inventory.get(i).getConsumable());
-                    basket.get(i).setQuantity(Integer.parseInt(studentIQuantity.getText()));
+                    Item myItem = new Item();
+                    myItem.setName(inventory.get(i).getName());
+                    myItem.setModel(inventory.get(i).getModel());
+                    myItem.setValue(inventory.get(i).getValue());
+                    myItem.setDate(inventory.get(i).getDate());
+                    myItem.setConsumable(inventory.get(i).getConsumable());
+                    myItem.setQuantity(Integer.parseInt(studentIQuantity.getText()));
+                    basket.add(myItem);
                     studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\n");
                 }
             }
@@ -463,7 +467,7 @@ public class GUI extends JFrame{
                 }
             }
             newQuantity = 1 + basket.get(nameIndex).getQuantity();
-            if (true){
+            if (newQuantity <= maxQuantity){
                 basket.get(nameIndex).setQuantity(newQuantity);
                 studentDashboardBasket.setText("");
                 studentDashboardBasket.append("Name \t Quantity\n");
@@ -622,12 +626,12 @@ public class GUI extends JFrame{
                 
             }
         else{
-            try{  //appends add item to inventory file
-                pout = new PrintWriter(new FileOutputStream("inventory.txt", true));
-                pout.append(iName.getText() + " " + iModel.getText() + " " + iValue.getText() + " " +
-                iQuantity.getText() + " " + iConsumable.getText() + " " + iDate.getText() + "\n");
-                pout.close();
-            } catch (FileNotFoundException a) {a.printStackTrace();} 
+            // try{  //appends add item to inventory file
+            //     pout = new PrintWriter(new FileOutputStream("inventory.txt", true));
+            //     pout.append(iName.getText() + " " + iModel.getText() + " " + iValue.getText() + " " +
+            //     iQuantity.getText() + " " + iConsumable.getText() + " " + iDate.getText() + "\n");
+            //     pout.close();
+            // } catch (FileNotFoundException a) {a.printStackTrace();} 
             
             iLabel.setText("Item Added.");
             
@@ -638,9 +642,44 @@ public class GUI extends JFrame{
                 cons = false;
             inventory.add(new Item(iName.getText(), iModel.getText(), Integer.parseInt(iValue.getText()),
             Integer.parseInt(iQuantity.getText()), cons, iDate.getText()));
-
+            writeInventory();
             iName.setText(""); iModel.setText(""); iValue.setText("");
             iQuantity.setText(""); iConsumable.setText(""); iDate.setText(""); //resets textfields
+        }
+    }
+
+    public void getInventoryFromFile(){
+        try{
+            Scanner in = new Scanner(new FileReader("inventory.txt"));
+            while(in.hasNext()){
+                boolean c = false;
+                String line = in.nextLine();
+                String[] data = line.split("\t");
+                if (data[4].equals("y")) c = true;
+                inventory.add(new Item(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]), c, data[5]));
+            }
+            in.close();
+        }
+        catch(FileNotFoundException fe){
+            fe.printStackTrace();
+        }
+    }
+
+    public void writeInventory(){
+        try{
+            PrintWriter out = new PrintWriter(new FileOutputStream("inventory.txt", false));
+            String c;
+            for (int i = 0; i < inventory.size(); i++){
+                c = "n";
+                if (inventory.get(i).getConsumable()) c = "y";
+                out.append(inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" +
+                inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\t" + c
+                + "\t" + inventory.get(i).getDate() + "\n");
+            }
+            out.close();
+        }
+        catch(FileNotFoundException fe){
+            fe.printStackTrace();
         }
     }
 
@@ -652,6 +691,7 @@ public class GUI extends JFrame{
                 inventory.get(i).setQuantity(0);
                 iLabel.setText("Item Deleted");
                 frame.setVisible(true);
+                writeInventory();
                 break;
             }
         }
@@ -671,6 +711,7 @@ public class GUI extends JFrame{
                 inventory.get(i).setDate(iDate.getText());
                 inventory.get(i).setConsumable(b);
                 inventory.get(i).setQuantity(Integer.parseInt(iQuantity.getText()));
+                writeInventory();
                 break;
             }
             else 
