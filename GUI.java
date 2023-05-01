@@ -368,6 +368,7 @@ public class GUI extends JFrame{
         inventoryPanel.add(iEnter);
         inventoryPanel.add(invDelete);
         inventoryPanel.add(invEdit); //edit still work in progress
+        inventoryPanel.add(iLabel);
     }
 
     private JTextField itemS = new JTextField();
@@ -490,7 +491,7 @@ public class GUI extends JFrame{
             System.out.print("empty");
         }
         else{
-            for(int i = 0; i<inventory.size(); i++){
+            for(int i = 0; i < inventory.size(); i++){
                 if (studentItemSelect.getText().equals(inventory.get(i).getName())){
                     nameIndex = i;
                 }
@@ -558,7 +559,7 @@ public class GUI extends JFrame{
 
     final JLabel enterInfo = new JLabel("Enter all required information.");
     final JLabel incorrectLogin = new JLabel("Incorrect Name or Password");
-    final JLabel iLabel = new JLabel("Item Added");
+    final JLabel iLabel = new JLabel("");
     
 
     class ButtonHandler implements ActionListener{
@@ -616,26 +617,15 @@ public class GUI extends JFrame{
     }
 
     private boolean cons;
-
+    //error where if not all info is added but name is added it executes delete item when the enter item button is pressed
     public void addInventory(){ //checks if entered item information, saves it to inventory 
-        inventoryPanel.add(iLabel);
-        frame.setVisible(true);
         if (iName.getText().isEmpty() || iModel.getText().isEmpty() || iConsumable.getText().isEmpty()
             || iQuantity.getText().isEmpty() || iValue.getText().isEmpty() || iDate.getText().isEmpty()){
                 iLabel.setText("Enter all required information.");
                 
             }
         else{
-            // try{  //appends add item to inventory file
-            //     pout = new PrintWriter(new FileOutputStream("inventory.txt", true));
-            //     pout.append(iName.getText() + " " + iModel.getText() + " " + iValue.getText() + " " +
-            //     iQuantity.getText() + " " + iConsumable.getText() + " " + iDate.getText() + "\n");
-            //     pout.close();
-            // } catch (FileNotFoundException a) {a.printStackTrace();} 
-            
             iLabel.setText("Item Added.");
-            
-
             if (iConsumable.getText().equals("y"))
                 cons = true;
             else // if another string is inputted it defaults to false
@@ -690,13 +680,13 @@ public class GUI extends JFrame{
             if (inventory.get(i).getName().equals(iName.getText())){
                 inventory.get(i).setQuantity(0);
                 iLabel.setText("Item Deleted");
-                frame.setVisible(true);
                 writeInventory();
                 break;
             }
         }
 
-        iName.setText("");
+        iName.setText(""); iModel.setText(""); iValue.setText("");
+        iQuantity.setText(""); iConsumable.setText(""); iDate.setText("");
         
     }
 
@@ -704,14 +694,18 @@ public class GUI extends JFrame{
         for (int i = 0; i < inventory.size(); i++){
             if (inventory.get(i).getName().equals(iName.getText())){
                 boolean b = false;
+                if (!iConsumable.getText().isEmpty()){
                 if (iConsumable.getText().equals("y")) b = true;
+                }
                 iLabel.setText("Edited " + iName.getText());
-                inventory.get(i).setModel(iModel.getText());
-                inventory.get(i).setValue(Integer.parseInt(iValue.getText()));
-                inventory.get(i).setDate(iDate.getText());
-                inventory.get(i).setConsumable(b);
-                inventory.get(i).setQuantity(Integer.parseInt(iQuantity.getText()));
+                if (!iModel.getText().isEmpty()) inventory.get(i).setModel(iModel.getText());  
+                if (!iValue.getText().isEmpty()) inventory.get(i).setValue(Integer.parseInt(iValue.getText()));
+                if (!iDate.getText().isEmpty()) inventory.get(i).setDate(iDate.getText());
+                if (!iConsumable.getText().isEmpty()) inventory.get(i).setConsumable(b);
+                if (!iQuantity.getText().isEmpty()) inventory.get(i).setQuantity(Integer.parseInt(iQuantity.getText()));
                 writeInventory();
+                iName.setText(""); iModel.setText(""); iValue.setText("");
+                iQuantity.setText(""); iConsumable.setText(""); iDate.setText("");
                 break;
             }
             else 
@@ -723,21 +717,21 @@ public class GUI extends JFrame{
         public void actionPerformed(ActionEvent e){
             if (e.getActionCommand().equals("Inventory Panel"))
                 cardLayout.show(frame.getContentPane(), "InventoryPanel");
-            if (e.getActionCommand().equals("Enter Item"))
+            else if (e.getActionCommand().equals("Enter Item"))
                 addInventory();
-            if (e.getActionCommand().equals("Back")){
+            else if (e.getActionCommand().equals("Back")){
                 cardLayout.show(frame.getContentPane(), "techPanel"); dashPanel.setText(""); }
-            if (e.getActionCommand().equals("Delete Item"));
+            else if (e.getActionCommand().equals("Delete Item"));
                 deleteItem();
             if (e.getActionCommand().equals("Dashboard")){
                 dashP(); cardLayout.show(frame.getContentPane(), "DashboardPanel"); }
-            if (e.getActionCommand().equals("Search"))
+            else if (e.getActionCommand().equals("Search"))
                 cardLayout.show(frame.getContentPane(), "iSearch");
-            if (e.getActionCommand().equals("enterItem"))
+            else if (e.getActionCommand().equals("enterItem"))
                 searchItem();
-            if (e.getActionCommand().equals("Edit Item"))
+            else if (e.getActionCommand().equals("Edit Item"))
                 editItem();
-            if (e.getActionCommand().equals("Go Back")){
+            else if (e.getActionCommand().equals("Go Back")){
                 cardLayout.show(frame.getContentPane(), "techPanel");
             }
 
