@@ -435,7 +435,11 @@ public class GUI extends JFrame{
         else{
             for (int i = 0; i<inventory.size(); i++){
                 if (studentIName.getText().equals(inventory.get(i).getName()) && (Integer.parseInt(studentIQuantity.getText()) <= inventory.get(i).getQuantity())){
-                    basket.add(inventory.get(i));
+                    basket.get(i).setName(inventory.get(i).getName());
+                    basket.get(i).setModel(inventory.get(i).getModel());
+                    basket.get(i).setValue(inventory.get(i).getValue());
+                    basket.get(i).setDate(inventory.get(i).getDate());
+                    basket.get(i).setConsumable(inventory.get(i).getConsumable());
                     basket.get(i).setQuantity(Integer.parseInt(studentIQuantity.getText()));
                     studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\n");
                 }
@@ -459,7 +463,7 @@ public class GUI extends JFrame{
                 }
             }
             newQuantity = 1 + basket.get(nameIndex).getQuantity();
-            if (newQuantity<=maxQuantity){
+            if (true){
                 basket.get(nameIndex).setQuantity(newQuantity);
                 studentDashboardBasket.setText("");
                 studentDashboardBasket.append("Name \t Quantity\n");
