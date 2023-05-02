@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatterBuilder;
 public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
-    private JPanel techPanel, techLoginPanel, inventoryPanel, itemSearch;
+    private JPanel techPanel, techLoginPanel, inventoryPanel, itemSearch, itemApproveP; //item Approve new
     private JPanel studentDashboardPanel,studentDashboardBasketPanel, techDash, studentItemSearch;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
@@ -33,12 +33,12 @@ public class GUI extends JFrame{
     private JButton studentDashboardButton, studentDashboardBackButton, studentISearchButton;
     private JButton studentDashboardBasketAdd, studentDashboardBasketReview, studentDashboardBasketBack;
     private JButton studentDashboardSendRequest, studentDashboardEditAdd, studentDashboardEditReduce; //new JButtons
-    private JButton techStudentRequestButton, techSearchStudentButton; //new JButton
-    private JTextField userText,TechText;
+    private JButton techStudentRequestButton, techSearchStudentButton, apButton; //new JButton
+    private JTextField userText,TechText, studentIDate; //studentIDate new
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
-    private JTextArea studentDashboardArea, studentDashboardBasket, dashPanel;
-    private JScrollPane itemScroll, studentDashboardScroll, studentDashboardBasketScroll;
+    private JTextArea studentDashboardArea, studentDashboardBasket, dashPanel, requestList; //request list new
+    private JScrollPane itemScroll, studentDashboardScroll, studentDashboardBasketScroll, requestScroll; //request Scroll new
 
     //java.time for current time and date
     private LocalDate currentDateObj = LocalDate.now();
@@ -59,6 +59,7 @@ public class GUI extends JFrame{
     ArrayList<Student> students = new ArrayList<Student>();
     ArrayList<Item> inventory = new ArrayList<Item>(); //for tech to add new items and edit existing ones
     ArrayList<Item> basket = new ArrayList<Item>(); //new, what the student takes
+    ArrayList<Request> RQ = new ArrayList<Request>();
 
     public GUI() throws FileNotFoundException{
         //general JFrame structure setup
@@ -79,6 +80,7 @@ public class GUI extends JFrame{
         itemSearch = new JPanel();
         techDash = new JPanel();
         studentItemSearch = new JPanel();
+        itemApproveP = new JPanel();
         cardLayout = new CardLayout();
 
         //text area convert to scroll pane
@@ -88,6 +90,8 @@ public class GUI extends JFrame{
         studentDashboardBasketScroll = new JScrollPane(studentDashboardBasket);
         dashPanel = new JTextArea();
         itemScroll = new JScrollPane(dashPanel); 
+        requestList = new JTextArea();
+        requestScroll = new JScrollPane(requestList);
 
         studentDashboardArea.setEditable(false);
         studentDashboardBasket.setEditable(false);
@@ -111,6 +115,7 @@ public class GUI extends JFrame{
         invEdit = new JButton("Edit Item");
         iSearch = new JButton("Search");
         iSearchBack = new JButton("Go Back");
+        apButton = new JButton("Approvals");
 
         for (int i = 0; i < 4; i++){
             invReturn[i] = new JButton("Back");
@@ -156,6 +161,7 @@ public class GUI extends JFrame{
         enterItem.addActionListener(TH);
         iSearchBack.addActionListener(TH);
         techStudentRequestButton.addActionListener(TH);
+        apButton.addActionListener(TH);
 
         studentEnterItem.addActionListener(SH);
         studentISearchButton.addActionListener(SH);
@@ -196,6 +202,7 @@ public class GUI extends JFrame{
         frame.add(itemSearch, "iSearch");
         frame.add(techDash, "DashboardPanel");
         frame.add(studentItemSearch, "studentItemSearch");
+        frame.add(itemApproveP, "ApprovalPanel");
         frame.setSize(1000,650);
         
         frame.setLocationRelativeTo(null);
@@ -218,6 +225,7 @@ public class GUI extends JFrame{
         invP();
         searchP();
         studentSearchP();
+        //approvalP();
     }
 
     public void techOrStu(){
@@ -323,13 +331,15 @@ public class GUI extends JFrame{
     JLabel studentNotifLabel;
 
     public void studentDashboardP(){ 
-        studentDashboardPanel.setLayout(new GridLayout(5,2));
+        studentDashboardPanel.setLayout(new GridLayout(6,2));
         studentDashboardPanel.add(new JLabel("Item dashboard: "));
         studentDashboardPanel.add(studentDashboardScroll);
         studentDashboardPanel.add(new JLabel("Item Name: "));
         studentDashboardPanel.add(studentIName = new JTextField(""));
         studentDashboardPanel.add(new JLabel("Item Quantity: "));
         studentDashboardPanel.add(studentIQuantity = new JTextField());
+        studentDashboardPanel.add(new JLabel("Date of return (dd-mm-yyyy): "));
+        studentDashboardPanel.add(studentIDate = new JTextField());
         studentDashboardPanel.add(studentNotifLabel = new JLabel("")); //item not found or, item add and so on (idk how to do this)
         studentDashboardPanel.add(studentDashboardBasketAdd);
         studentDashboardPanel.add(studentDashboardBackButton);
@@ -352,10 +362,11 @@ public class GUI extends JFrame{
     private JButton itemDashButton = new JButton("Dashboard");
 
     public void techP(){ //panel after logging into tech
-        techPanel.setLayout(new GridLayout(5, 5));
+        techPanel.setLayout(new GridLayout(6,1));
         techPanel.add(inventoryButton);
         techPanel.add(itemDashButton);
         techPanel.add(iSearch);
+        techPanel.add(apButton);
         techPanel.add(techBackButton);
     }
 
@@ -415,7 +426,7 @@ public class GUI extends JFrame{
         
         techDash.setLayout(new GridLayout(2,1,5,5));
         techDash.add(itemScroll);
-        dashPanel.append("Name \t Model# \t Value \t Quantity\n");
+        dashPanel.append("Name \t Model# \t Value \t Quantity\t Consumable\t Date\n");
         techDash.add(invReturn[1]);
 
         for (int i = 0; i < inventory.size(); i++){
@@ -434,7 +445,7 @@ public class GUI extends JFrame{
     }
 
     public void studentDashboardSetup(){ //sets up the look of the dashboard text area
-        studentDashboardArea.append("Name \t Model# \t Value \t Quantity\n");
+        studentDashboardArea.append("Name \t Model# \t Value \t Quantity\t Consumable\t Date\n");
         for (int i = 0; i < inventory.size(); i++){
             studentDashboardArea.append(inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" +
             inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\t" + inventory.get(i).getConsumable()
@@ -461,9 +472,10 @@ public class GUI extends JFrame{
                     myItem.setConsumable(inventory.get(i).getConsumable());
                     myItem.setQuantity(Integer.parseInt(studentIQuantity.getText()));
                     basket.add(myItem);
-                    studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\n");
+                    studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\t" + studentIDate.getText() + "\n");
                     studentIName.setText("");
                     studentIQuantity.setText("");
+                    studentIDate.setText("");
                 }
             }
             
@@ -528,19 +540,61 @@ public class GUI extends JFrame{
             
         }
     }
-
+    //here
     public void sendItemRequest(){ //new method that appends to a file
         try{
             String fileName = loggedStudent.getID() + "Request.txt";
             String basketItems = studentDashboardBasket.getText();
             PrintWriter out = new PrintWriter(new FileOutputStream(fileName, false));
-            out.append("REQUEST FORM" + "\n" + basketItems + "\n" + currentDate + "\t" + currentTime + "\n"
-            + "Name: " + loggedStudent.getName() + "\t" + "Phone Number: " + loggedStudent.getPhoneNumber() + "\n");
+            out.append(loggedStudent.getName() + "\t" + "Phone Number: " + loggedStudent.getPhoneNumber() + "\n" 
+            + basketItems + "\n" + currentDate + "\t" + currentTime + "\n");
             out.close();
+
+            for (int i = 0; i < students.size(); i++){ //sets boolean request to true if a students requests
+                if (loggedStudent.getID() == students.get(i).getID()){
+                    students.get(i).setRequest(true);
+                }
+            }
         } catch (FileNotFoundException e){
             e.printStackTrace();
         }
         basket.clear();
+    }
+
+    //JComboBox pending;
+    public void approvalP(){
+        ArrayList<String> IDRequest = new ArrayList<String>();
+        itemApproveP.setLayout(new GridLayout(2, 2));
+        requestList.setEditable(false);
+        requestList.append("Name \t ");
+        for (int i = 0; i < students.size(); i++){
+            if (students.get(i).isRequest())
+                IDRequest.add(students.get(i).getID());
+        }
+        for (int j = 0; j < IDRequest.size(); j++){
+            try{
+                Scanner in = new Scanner(new FileReader(IDRequest.get(j) + "Request.txt"));
+                while (in.hasNext()){
+                    String temp = in.next();
+                    if (in.next().equals("Name") || in.next().equals(currentDate))
+                        continue;
+                    else {
+                        requestList.append(in.next() + "\t");
+                    }
+                }
+                requestList.append("\n");
+                in.close();
+            }
+            catch (FileNotFoundException e){
+                e.printStackTrace ();
+            }
+        }
+        itemApproveP.add(new JLabel("welcome to approval panel"));
+        itemApproveP.add(requestScroll);
+    }
+
+    public void approveItem(){
+
     }
 
     public void studentResetTexts(){ //new method
@@ -680,7 +734,7 @@ public class GUI extends JFrame{
         }
     }
 
-    public void getInventoryFromFile(){
+    public void getInventoryFromFile(){ //new (I think)
         try{
             Scanner in = new Scanner(new FileReader("inventory.txt"));
             while(in.hasNext()){
@@ -730,7 +784,7 @@ public class GUI extends JFrame{
         
     }
 
-    public void editItem(){
+    public void editItem(){ //new
         for (int i = 0; i < inventory.size(); i++){
             if (inventory.get(i).getName().equals(iName.getText())){
                 boolean b = false;
@@ -776,6 +830,10 @@ public class GUI extends JFrame{
             }
             if (e.getActionCommand().equals("Student Search")){
                 //search for students
+            }
+            if (e.getActionCommand().equals("Approvals")){
+                approvalP();
+                cardLayout.show(frame.getContentPane(), "ApprovalPanel");
             }
 
         }

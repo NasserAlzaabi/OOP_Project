@@ -6,6 +6,7 @@ class Student extends User{
 	
 	String phone_Number;
 	ArrayList<Item> items = new ArrayList<Item>();
+	boolean request = false; // new variable
 
 	public Student(String id, String n, String p, String phone_Number) { //calls on user constructor and adds phone num to it
 		super(id, n, p);
@@ -22,6 +23,14 @@ class Student extends User{
 		super(c);
 		this.phone_Number = c.phone_Number;
 		this.items = c.items;
+	}
+
+	public boolean isRequest() { //new
+		return request;
+	}
+
+	public void setRequest(boolean request) { //new
+		this.request = request;
 	}
 
 	public Student(){
