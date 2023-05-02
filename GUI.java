@@ -458,27 +458,34 @@ public class GUI extends JFrame{
     }
 
     public void studentBasketAddItem(){
+        Item myItem;
         if (studentIName.getText().isEmpty() || studentIQuantity.getText().isEmpty()){
             studentNotifLabel.setText("Please provide Information");
         }
         else{
+            int nameIndex = 0;
             for (int i = 0; i<inventory.size(); i++){
-                if (studentIName.getText().equals(inventory.get(i).getName()) && (Integer.parseInt(studentIQuantity.getText()) <= inventory.get(i).getQuantity())){
-                    Item myItem = new Item();
-                    myItem.setName(inventory.get(i).getName());
-                    myItem.setModel(inventory.get(i).getModel());
-                    myItem.setValue(inventory.get(i).getValue());
-                    myItem.setDate(inventory.get(i).getDate());
-                    myItem.setConsumable(inventory.get(i).getConsumable());
-                    myItem.setQuantity(Integer.parseInt(studentIQuantity.getText()));
-                    basket.add(myItem);
-                    studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\t" + studentIDate.getText() + "\n");
-                    studentIName.setText("");
-                    studentIQuantity.setText("");
-                    studentIDate.setText("");
+                if (studentIName.getText().equals(inventory.get(i).getName())){
+                    nameIndex = i;
                 }
             }
-            
+            if (Integer.parseInt(studentIQuantity.getText()) <= inventory.get(nameIndex).getQuantity()){
+                myItem = new Item();
+                myItem.setName(inventory.get(nameIndex).getName());
+                myItem.setModel(inventory.get(nameIndex).getModel());
+                myItem.setValue(inventory.get(nameIndex).getValue());
+                myItem.setDate(inventory.get(nameIndex).getDate());
+                myItem.setConsumable(inventory.get(nameIndex).getConsumable());
+                myItem.setQuantity(Integer.parseInt(studentIQuantity.getText()));
+                basket.add(myItem);
+                studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\t" + studentIDate.getText() + "\n");
+                studentIName.setText("");
+                studentIQuantity.setText("");
+                studentIDate.setText("");
+            }
+            else{
+                studentNotifLabel.setText("That amount is not in stock");
+            }
         }
     }
 
@@ -503,10 +510,10 @@ public class GUI extends JFrame{
                 studentDashboardBasket.append("Name \t Quantity\n");
                 for (int i = 0; i<basket.size(); i++){
                     if (i!=nameIndex){
-                        studentDashboardBasket.append(basket.get(i).getName() + "\t" + basket.get(i).getQuantity() + "\n");
+                        studentDashboardBasket.append(basket.get(i).getName() + "\t" + basket.get(i).getQuantity() + "\t" + basket.get(i).getDate() + "\n"); //new nasser
                     }
                 }
-                studentDashboardBasket.append(basket.get(nameIndex).getName() + "\t" + basket.get(nameIndex).getQuantity() + "\n");
+                studentDashboardBasket.append(basket.get(nameIndex).getName() + "\t" + basket.get(nameIndex).getQuantity() + "\t" + basket.get(nameIndex).getDate() + "\n"); //new nasser
             }
             
         }
@@ -532,10 +539,10 @@ public class GUI extends JFrame{
                 studentDashboardBasket.append("Name \t Quantity\n");
                 for (int i = 0; i<basket.size(); i++){
                     if (i!=nameIndex){
-                        studentDashboardBasket.append(basket.get(i).getName() + "\t" + basket.get(i).getQuantity() + "\n");
+                        studentDashboardBasket.append(basket.get(i).getName() + "\t" + basket.get(i).getQuantity() + "\t" + basket.get(i).getDate() + "\n");
                     }
                 }
-                studentDashboardBasket.append(basket.get(nameIndex).getName() + "\t" + basket.get(nameIndex).getQuantity() + "\n");
+                studentDashboardBasket.append(basket.get(nameIndex).getName() + "\t" + basket.get(nameIndex).getQuantity() + "\t" + basket.get(nameIndex).getDate() + "\n");
             }
             
         }
@@ -586,7 +593,7 @@ public class GUI extends JFrame{
                 in.close();
             }
             catch (FileNotFoundException e){
-                e.printStackTrace ();
+                e.printStackTrace();
             }
         }
         itemApproveP.add(new JLabel("welcome to approval panel"));
@@ -621,7 +628,9 @@ public class GUI extends JFrame{
                     break;
                 }
             }
-        } catch(FileNotFoundException e) {e.printStackTrace();}
+        } catch(FileNotFoundException e) {
+            e.printStackTrace();
+        }
         return isLogin;
     }
 
