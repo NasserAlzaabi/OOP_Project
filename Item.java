@@ -22,7 +22,7 @@ public class Item {
 		this.quantity = q;
 		this.consumable = c;
 
-		if (c)this.date = ""; //consumable no date "y"
+		if (c)this.date = "0"; //consumable no date "y"
 
 		else this.date = d; // "n"
 	}

@@ -11,10 +11,16 @@ class User{
         pass = "";
     }
 
-    public User(String n, String id, String p){
+    public User(String id, String n, String p){
         user_id = id;
         name = n;
         pass = p;
+    }
+
+    public User(User u){
+        this.user_id = u.user_id;
+        this.name = u.name;
+        this.pass = u.pass;
     }
 
 }

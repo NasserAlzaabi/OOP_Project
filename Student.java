@@ -5,7 +5,6 @@ import java.util.ArrayList;
 class Student extends User{
 	
 	String phone_Number;
-	Item itemHeld;
 	ArrayList<Item> items = new ArrayList<Item>();
 
 	public Student(String id, String n, String p, String phone_Number) { //calls on user constructor and adds phone num to it
@@ -18,6 +17,22 @@ class Student extends User{
 		this.phone_Number = phone_Number;
 		this.items = BorrowedItems;
 	}
+
+	public Student(Student c){
+		super(c);
+		this.phone_Number = c.phone_Number;
+		this.items = c.items;
+	}
+
+	public Student(){
+		super();
+		this.phone_Number = "";
+	}
+
+	public String getID(){return super.user_id;}
+	public String getName(){return super.name;}
+	public String getPhoneNumber(){return phone_Number;}
+
 
 	public void addItem(Item item){ //new method 
 		items.add(item);
@@ -34,7 +49,8 @@ class Student extends User{
 	public ArrayList<Item> getItems(){
 		return this.items;
 	}
+
 	// public String sendItemRequest(){
-	// 	//
+	// 	
 	// }
 }

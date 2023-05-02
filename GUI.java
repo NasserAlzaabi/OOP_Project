@@ -18,6 +18,8 @@ import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.security.InvalidKeyException;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 
 public class GUI extends JFrame{
     private JFrame frame;
@@ -30,12 +32,21 @@ public class GUI extends JFrame{
     private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch, iSearchBack, studentISearchBack;
     private JButton studentDashboardButton, studentDashboardBackButton, studentISearchButton;
     private JButton studentDashboardBasketAdd, studentDashboardBasketReview, studentDashboardBasketBack;
-    private JButton studentDashboardSendRequest, studentDashboardEditAdd, studentDashboardEditReduce; //new JButton
+    private JButton studentDashboardSendRequest, studentDashboardEditAdd, studentDashboardEditReduce; //new JButtons
+    private JButton techStudentRequestButton, techSearchStudentButton; //new JButton
     private JTextField userText,TechText;
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
     private JTextArea studentDashboardArea, studentDashboardBasket, dashPanel;
     private JScrollPane itemScroll, studentDashboardScroll, studentDashboardBasketScroll;
+
+    //java.time for current time and date
+    private LocalDate currentDateObj = LocalDate.now();
+    private LocalTime currentTimeObj = LocalTime.now();
+    private DateTimeFormatter currentTimeFormat = DateTimeFormatter.ofPattern("HH:mm:ss"); 
+	private DateTimeFormatter currentDateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	private String currentDate = currentDateObj.format(currentDateFormat);
+    private String currentTime = currentTimeObj.format(currentTimeFormat);
 
     PrintWriter pout;
     Technician tech = new Technician(); //technician
@@ -44,6 +55,7 @@ public class GUI extends JFrame{
     private FileInputStream fin;
     ObjectInputStream in;
     ObjectOutputStream out;
+    Student loggedStudent;
     ArrayList<Student> students = new ArrayList<Student>();
     ArrayList<Item> inventory = new ArrayList<Item>(); //for tech to add new items and edit existing ones
     ArrayList<Item> basket = new ArrayList<Item>(); //new, what the student takes
@@ -87,12 +99,10 @@ public class GUI extends JFrame{
 
         RSButton = new JButton("Return to Selection");
         RSButton2 = new JButton("Return to Selection");
-        techBackButton = new JButton("Return to Main Menu"); //return button for tech panel
         studentButton = new JButton("Student");
         technicianButton = new JButton("Technician");
         loginButton = new JButton("Login");
         submitLogin = new JButton("Enter");
-        TsubmitLogin = new JButton("Enter");
         submitSignup = new JButton("Submit");
         signupButton = new JButton("Sign Up");
         exitButton = new JButton("Exit");
@@ -109,6 +119,10 @@ public class GUI extends JFrame{
 
         studentISearchButton = new JButton("Search");
         studentISearchBack = new JButton("Go Back");
+
+        TsubmitLogin = new JButton("Enter");
+        techStudentRequestButton = new JButton("Student Search");
+        techBackButton = new JButton("Return to Main Menu");
 
         //studentDashboard buttons
         studentDashboardButton = new JButton("Item Dashboard");
@@ -141,6 +155,7 @@ public class GUI extends JFrame{
         iSearch.addActionListener(TH);
         enterItem.addActionListener(TH);
         iSearchBack.addActionListener(TH);
+        techStudentRequestButton.addActionListener(TH);
 
         studentEnterItem.addActionListener(SH);
         studentISearchButton.addActionListener(SH);
@@ -339,9 +354,9 @@ public class GUI extends JFrame{
     public void techP(){ //panel after logging into tech
         techPanel.setLayout(new GridLayout(5, 5));
         techPanel.add(inventoryButton);
-        techPanel.add(techBackButton);
         techPanel.add(itemDashButton);
         techPanel.add(iSearch);
+        techPanel.add(techBackButton);
     }
 
     private JTextField iName, iModel, iValue, iQuantity, iDate, iConsumable;
@@ -447,8 +462,11 @@ public class GUI extends JFrame{
                     myItem.setQuantity(Integer.parseInt(studentIQuantity.getText()));
                     basket.add(myItem);
                     studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\n");
+                    studentIName.setText("");
+                    studentIQuantity.setText("");
                 }
             }
+            
         }
     }
 
@@ -457,14 +475,13 @@ public class GUI extends JFrame{
         int maxQuantity = 0;
         int nameIndex = 0;
         if (studentItemSelect.getText().isEmpty()){
-            System.out.print("empty");
+            //do studentilabel here nasser
         }
         else{
             for(int i = 0; i<inventory.size(); i++){
                 if (studentItemSelect.getText().equals(inventory.get(i).getName())){
                     nameIndex = i;
                     maxQuantity = inventory.get(i).getQuantity();
-                    System.out.print(maxQuantity);
                 }
             }
             newQuantity = 1 + basket.get(nameIndex).getQuantity();
@@ -509,8 +526,30 @@ public class GUI extends JFrame{
                 studentDashboardBasket.append(basket.get(nameIndex).getName() + "\t" + basket.get(nameIndex).getQuantity() + "\n");
             }
             
-        }    }
+        }
+    }
 
+    public void sendItemRequest(){ //new method that appends to a file
+        try{
+            String fileName = loggedStudent.getID() + "Request.txt";
+            String basketItems = studentDashboardBasket.getText();
+            PrintWriter out = new PrintWriter(new FileOutputStream(fileName, false));
+            out.append("REQUEST FORM" + "\n" + basketItems + "\n" + currentDate + "\t" + currentTime + "\n"
+            + "Name: " + loggedStudent.getName() + "\t" + "Phone Number: " + loggedStudent.getPhoneNumber() + "\n");
+            out.close();
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
+        basket.clear();
+    }
+
+    public void studentResetTexts(){ //new method
+        studentIName.setText("");
+        studentIQuantity.setText("");
+        studentItemSelect.setText("");
+        studentDashboardBasket.setText("");
+        studentDashboardArea.setText("");
+    }
     
 
 
@@ -523,6 +562,7 @@ public class GUI extends JFrame{
                 String line = fin.nextLine();
                 String[] data = line.split(" ");
                 if(data[0].equals(id) && data[2].equals(password)){
+                    loggedStudent = new Student(data[0],data[1],data[2],data[3]); //sets loggedstudent when logged in
                     isLogin = true;
                     break;
                 }
@@ -568,8 +608,10 @@ public class GUI extends JFrame{
                 cardLayout.show(frame.getContentPane(), "LoginPanel");
             if (e.getActionCommand().equals("Sign Up"))
                 cardLayout.show(frame.getContentPane(), "SignupPanel");
-            if (e.getActionCommand().equals("Return"))
+            if (e.getActionCommand().equals("Return")){
+                loggedStudent = new Student(); //resets logged student when loggin out
                 cardLayout.show(frame.getContentPane(), "MainPanel");
+            }      
             if (e.getActionCommand().equals("Return to Selection"))
                 cardLayout.show(frame.getContentPane(), "TechOrStuPanel");
             if (e.getActionCommand().equals("Return to Main Menu"))
@@ -674,8 +716,6 @@ public class GUI extends JFrame{
     }
 
     public void deleteItem(){
-        
-
         for (int i = 0; i < inventory.size(); i++){
             if (inventory.get(i).getName().equals(iName.getText())){
                 inventory.get(i).setQuantity(0);
@@ -725,14 +765,17 @@ public class GUI extends JFrame{
                 deleteItem();
             if (e.getActionCommand().equals("Dashboard")){
                 dashP(); cardLayout.show(frame.getContentPane(), "DashboardPanel"); }
-            else if (e.getActionCommand().equals("Search"))
+            if (e.getActionCommand().equals("Search"))
                 cardLayout.show(frame.getContentPane(), "iSearch");
-            else if (e.getActionCommand().equals("enterItem"))
+            if (e.getActionCommand().equals("enterItem"))
                 searchItem();
-            else if (e.getActionCommand().equals("Edit Item"))
+            if (e.getActionCommand().equals("Edit Item"))
                 editItem();
-            else if (e.getActionCommand().equals("Go Back")){
+            if (e.getActionCommand().equals("Go Back")){
                 cardLayout.show(frame.getContentPane(), "techPanel");
+            }
+            if (e.getActionCommand().equals("Student Search")){
+                //search for students
             }
 
         }
@@ -767,6 +810,7 @@ public class GUI extends JFrame{
             } 
             if (e.getActionCommand().equals("Return to Dashboard")){
                 cardLayout.show(frame.getContentPane(), "studentDashboardPanel");
+
             }
             if (e.getActionCommand().equals("+1")){
                 studentItemQuantityAdd();
@@ -775,7 +819,9 @@ public class GUI extends JFrame{
                 studentItemQuantityReduce();   
             }
             if (e.getActionCommand().equals("Send Request")){
-                //
+                sendItemRequest();
+                studentResetTexts();
+                cardLayout.show(frame.getContentPane(), "studentPanel");
             }
         }
     }
