@@ -9,6 +9,12 @@ public class Request {
 		Date = date;
 		this.items = items;
 	}
+	public String getDate() {
+		return Date;
+	}
+	public void setDate(String date) {
+		Date = date;
+	}
 	String Name, ID, Date;
 	ArrayList<Item> items = new ArrayList<Item>();
 

@@ -25,6 +25,14 @@ class Student extends User{
 		this.items = c.items;
 	}
 
+	public String getPhone_Number() {
+		return phone_Number;
+	}
+
+	public void setPhone_Number(String phone_Number) {
+		this.phone_Number = phone_Number;
+	}
+
 	public boolean isRequest() { //new
 		return request;
 	}

@@ -24,20 +24,20 @@ import java.time.format.DateTimeFormatterBuilder;
 public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
-    private JPanel techPanel, techLoginPanel, inventoryPanel, itemSearch, itemApproveP; //item Approve new
+    private JPanel techPanel, techLoginPanel, inventoryPanel, itemSearch, itemApproveP, borrowedPanel; //itemApprove, borrowed new
     private JPanel studentDashboardPanel,studentDashboardBasketPanel, techDash, studentItemSearch;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
     private JButton loginButton,signupButton,submitLogin,TsubmitLogin,submitSignup,exitButton;
-    private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch, iSearchBack, studentISearchBack;
+    private JButton studentButton,technicianButton,RSButton,RSButton2,techBackButton, iSearch, iSearchBack[], studentISearchBack;
     private JButton studentDashboardButton, studentDashboardBackButton, studentISearchButton;
     private JButton studentDashboardBasketAdd, studentDashboardBasketReview, studentDashboardBasketBack;
     private JButton studentDashboardSendRequest, studentDashboardEditAdd, studentDashboardEditReduce; //new JButtons
-    private JButton techStudentRequestButton, techSearchStudentButton, apButton; //new JButton
-    private JTextField userText,TechText, studentIDate; //studentIDate new
+    private JButton techStudentRequestButton, techSearchStudentButton, apButton, approveButton, borrowedButton; //new JButton
+    private JTextField userText,TechText, studentIDate, apName; //studentIDate, apName new
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
-    private JTextArea studentDashboardArea, studentDashboardBasket, dashPanel, requestList; //request list new
+    private JTextArea studentDashboardArea, studentDashboardBasket, dashPanel, requestList, borrowedStudents; //request list new
     private JScrollPane itemScroll, studentDashboardScroll, studentDashboardBasketScroll, requestScroll; //request Scroll new
 
     //java.time for current time and date
@@ -81,6 +81,7 @@ public class GUI extends JFrame{
         techDash = new JPanel();
         studentItemSearch = new JPanel();
         itemApproveP = new JPanel();
+        borrowedPanel = new JPanel();
         cardLayout = new CardLayout();
 
         //text area convert to scroll pane
@@ -92,14 +93,19 @@ public class GUI extends JFrame{
         itemScroll = new JScrollPane(dashPanel); 
         requestList = new JTextArea();
         requestScroll = new JScrollPane(requestList);
+        borrowedStudents = new JTextArea();
 
         studentDashboardArea.setEditable(false);
         studentDashboardBasket.setEditable(false);
         dashPanel.setEditable(false);
+        requestList.setEditable(false);
+        borrowedStudents.setEditable(false);
 
         ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
         techHandler TH = new techHandler();
         studentHandler SH = new studentHandler();
+
+        iSearchBack = new JButton[3];
 
         RSButton = new JButton("Return to Selection");
         RSButton2 = new JButton("Return to Selection");
@@ -114,8 +120,12 @@ public class GUI extends JFrame{
         invDelete = new JButton("Delete Item");
         invEdit = new JButton("Edit Item");
         iSearch = new JButton("Search");
-        iSearchBack = new JButton("Go Back");
+        iSearchBack[0] = new JButton("Go Back");
+        iSearchBack[1] = new JButton("Go Back");
+        iSearchBack[2] = new JButton("Go Back");
         apButton = new JButton("Approvals");
+        approveButton = new JButton("Approve");
+        borrowedButton = new JButton("Borrowed Student");
 
         for (int i = 0; i < 4; i++){
             invReturn[i] = new JButton("Back");
@@ -159,9 +169,13 @@ public class GUI extends JFrame{
         itemDashButton.addActionListener(TH);
         iSearch.addActionListener(TH);
         enterItem.addActionListener(TH);
-        iSearchBack.addActionListener(TH);
+        iSearchBack[0].addActionListener(TH);
+        iSearchBack[1].addActionListener(TH);
+        iSearchBack[2].addActionListener(TH);
         techStudentRequestButton.addActionListener(TH);
         apButton.addActionListener(TH);
+        approveButton.addActionListener(TH);
+        borrowedButton.addActionListener(TH);
 
         studentEnterItem.addActionListener(SH);
         studentISearchButton.addActionListener(SH);
@@ -203,6 +217,7 @@ public class GUI extends JFrame{
         frame.add(techDash, "DashboardPanel");
         frame.add(studentItemSearch, "studentItemSearch");
         frame.add(itemApproveP, "ApprovalPanel");
+        frame.add(borrowedPanel, "borrowedPanel");
         frame.setSize(1000,650);
         
         frame.setLocationRelativeTo(null);
@@ -367,7 +382,24 @@ public class GUI extends JFrame{
         techPanel.add(itemDashButton);
         techPanel.add(iSearch);
         techPanel.add(apButton);
+        techPanel.add(borrowedButton);
         techPanel.add(techBackButton);
+    }
+
+    public void borrowedP(){ //new
+        borrowedPanel.setLayout(new GridLayout(2,2));
+        borrowedStudents.setText("");
+        borrowedStudents.append("Name \t ID \t Due Date");
+        for (int i = 0; i < students.size(); i++){
+            if (!students.get(i).getItems().isEmpty()){
+                borrowedStudents.append(students.get(i).getName());
+                borrowedStudents.append(students.get(i).getID());
+                borrowedStudents.append(students.get(i).getName());
+            }
+        }
+
+        borrowedPanel.add(borrowedStudents);
+        borrowedPanel.add(iSearchBack[2]);
     }
 
     private JTextField iName, iModel, iValue, iQuantity, iDate, iConsumable;
@@ -405,7 +437,7 @@ public class GUI extends JFrame{
         itemSearch.add(itemS);
         itemSearch.add(enterItem);
         itemSearch.add(iInfo);
-        itemSearch.add(iSearchBack);
+        itemSearch.add(iSearchBack[0]);
     }
 
     final JLabel iInfo = new JLabel("");
@@ -426,12 +458,14 @@ public class GUI extends JFrame{
         
         techDash.setLayout(new GridLayout(2,1,5,5));
         techDash.add(itemScroll);
-        dashPanel.append("Name \t Model# \t Value \t Quantity\t Consumable\t Date\n");
+        dashPanel.append("Name \t Model# \t Value \t Quantity\t Consumable\t Date \t Borrowed Quantity\n");
         techDash.add(invReturn[1]);
 
         for (int i = 0; i < inventory.size(); i++){
             dashPanel.append(inventory.get(i).getName() + "\t" + inventory.get(i).getModel() + "\t" +
-            inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\n");
+            inventory.get(i).getValue() + "\t" + inventory.get(i).getQuantity() + "\t" + inventory.get(i).getConsumable()
+             + "\t" + inventory.get(i).getDate() + "\t"
+            + inventory.get(i).getBorrowedQuantity() +"\n");
         }
         
     }
@@ -456,6 +490,8 @@ public class GUI extends JFrame{
     public void studentDashboardBasketSetup(){
         studentDashboardBasket.append("Name \t Quantity\n");
     }
+    
+    String dateStudent;
 
     public void studentBasketAddItem(){
         Item myItem;
@@ -478,7 +514,13 @@ public class GUI extends JFrame{
                 myItem.setConsumable(inventory.get(nameIndex).getConsumable());
                 myItem.setQuantity(Integer.parseInt(studentIQuantity.getText()));
                 basket.add(myItem);
+                dateStudent = studentIDate.getText();
                 studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\t" + studentIDate.getText() + "\n");
+                for (int n = 0; n < inventory.size();n++)
+                {
+                    if (inventory.get(n).getName().equals(studentIName.getText()))
+                        inventory.get(n).setDate(studentIDate.getText());
+                }
                 studentIName.setText("");
                 studentIQuantity.setText("");
                 studentIDate.setText("");
@@ -556,7 +598,7 @@ public class GUI extends JFrame{
             out.append(loggedStudent.getName() + "\t" + "Phone Number: " + loggedStudent.getPhoneNumber() + "\n" 
             + basketItems + "\n" + currentDate + "\t" + currentTime + "\n");
             out.close();
-
+            RQ.add(new Request(loggedStudent.getName(), loggedStudent.getID(), dateStudent, basket));
             for (int i = 0; i < students.size(); i++){ //sets boolean request to true if a students requests
                 if (loggedStudent.getID() == students.get(i).getID()){
                     students.get(i).setRequest(true);
@@ -565,43 +607,69 @@ public class GUI extends JFrame{
         } catch (FileNotFoundException e){
             e.printStackTrace();
         }
+        for (int i = 0; i < basket.size(); i++){
+            for (int j = 0; j < inventory.size(); j++){
+                if (basket.get(i).getName().equals(inventory.get(j).getName())){
+                    inventory.get(j).setBorrowedQuantity(basket.get(i).getQuantity());
+                }
+            }
+        }
         basket.clear();
     }
 
     //JComboBox pending;
-    public void approvalP(){
+    final JLabel isApprove = new JLabel(""); //new
+    static int n = 0;
+    public void approvalP(){ //new
         ArrayList<String> IDRequest = new ArrayList<String>();
-        itemApproveP.setLayout(new GridLayout(2, 2));
-        requestList.setEditable(false);
-        requestList.append("Name \t ");
+        
+        itemApproveP.setLayout(new GridLayout(4, 2));
+        requestList.setText("");
+        requestList.append("Name \t Date of Return\n");
         for (int i = 0; i < students.size(); i++){
             if (students.get(i).isRequest())
                 IDRequest.add(students.get(i).getID());
         }
-        for (int j = 0; j < IDRequest.size(); j++){
-            try{
-                Scanner in = new Scanner(new FileReader(IDRequest.get(j) + "Request.txt"));
-                while (in.hasNext()){
-                    String temp = in.next();
-                    if (in.next().equals("Name") || in.next().equals(currentDate))
-                        continue;
-                    else {
-                        requestList.append(in.next() + "\t");
-                    }
-                }
-                requestList.append("\n");
-                in.close();
-            }
-            catch (FileNotFoundException e){
-                e.printStackTrace();
-            }
+        for (int j = 0; j < RQ.size(); j++){
+    
+            requestList.append(RQ.get(j).getName() + "\t" + RQ.get(j).getDate() + "\t");
+            for (int n = 0; n < RQ.get(j).getItems().size(); n++)
+                requestList.append(RQ.get(j).getItems().get(n).getName());
+            requestList.append("\n");
         }
-        itemApproveP.add(new JLabel("welcome to approval panel"));
+        
+        if (n == 0){
+            itemApproveP.add(new JLabel("Enter student name to Approve: "));
+            itemApproveP.add(apName = new JTextField());
+        }
         itemApproveP.add(requestScroll);
+        itemApproveP.add(isApprove);
+        itemApproveP.add(approveButton);
+        itemApproveP.add(iSearchBack[1]);
+        n++;
     }
 
-    public void approveItem(){
+    public void approveItem(){ //new
+        
+        for (int i = 0; i < students.size(); i++){
+            if (students.get(i).isRequest()){
+                for (int j = 0; j < RQ.size(); j++){
+                    if (students.get(i).getName().equals(RQ.get(j).getName())){ //the inside of this code is not executed
+                        isApprove.setText("Approved " + apName.getText() + "'s request");
+                        students.get(i).setRequest(false);
+                        students.get(i).setItems(RQ.get(j).getItems());
+                        for (int q = 0; q < inventory.size(); q++){
+                            for (int a = 0; a < RQ.get(j).getItems().size(); a++){
+                                if (inventory.get(q).getName().equals(RQ.get(j).getItems().get(a).getName())){ 
+                                    inventory.get(q).setQuantity(inventory.get(q).getQuantity() - inventory.get(q).getBorrowedQuantity());
+                                }
+                            }
+                        }
+                    }
 
+                }
+            }
+        }
     }
 
     public void studentResetTexts(){ //new method
@@ -843,6 +911,13 @@ public class GUI extends JFrame{
             if (e.getActionCommand().equals("Approvals")){
                 approvalP();
                 cardLayout.show(frame.getContentPane(), "ApprovalPanel");
+            }
+            if (e.getActionCommand().equals("Approve")){
+                approveItem();
+            }
+            if (e.getActionCommand().equals("Borrowed Student")){
+                borrowedP();
+                cardLayout.show(frame.getContentPane(), "borrowedPanel");
             }
 
         }

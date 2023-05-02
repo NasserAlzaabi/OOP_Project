@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatterBuilder;
 public class Item {
 	
 	protected String name, model, date;
-	protected int value, quantity; //date :ddmmyy:
+	protected int value, quantity, borrowedQuantity = 0; //date :ddmmyy:
 	boolean consumable;
 
 	//sets current date in dd-mm-yyyy format
@@ -25,6 +25,14 @@ public class Item {
 		if (c)this.date = "0"; //consumable no date "y"
 
 		else this.date = d; // "n"
+	}
+
+	public int getBorrowedQuantity() {
+		return borrowedQuantity;
+	}
+
+	public void setBorrowedQuantity(int borrowedQuantity) {
+		this.borrowedQuantity = borrowedQuantity;
 	}
 
 	public Item(){
