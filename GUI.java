@@ -24,7 +24,7 @@ import java.time.format.DateTimeFormatterBuilder;
 public class GUI extends JFrame{
     private JFrame frame;
     private JPanel techOrStuPanel,mainPanel,loginPanel,signupPanel,successPanel,studentPanel;
-    private JPanel techPanel, techLoginPanel, inventoryPanel, itemSearch, itemApproveP, borrowedPanel; //itemApprove, borrowed new
+    private JPanel techPanel, techLoginPanel, inventoryPanel, studentSearchPanel, itemSearch, itemApproveP, borrowedPanel; //itemApprove, borrowed new
     private JPanel studentDashboardPanel,studentDashboardBasketPanel, techDash, studentItemSearch;
     private CardLayout cardLayout;
     private JLabel mainLabel,userLabel,passwordLabel;
@@ -33,12 +33,12 @@ public class GUI extends JFrame{
     private JButton studentDashboardButton, studentDashboardBackButton, studentISearchButton;
     private JButton studentDashboardBasketAdd, studentDashboardBasketReview, studentDashboardBasketBack;
     private JButton studentDashboardSendRequest, studentDashboardEditAdd, studentDashboardEditReduce; //new JButtons
-    private JButton techStudentRequestButton, techSearchStudentButton, apButton, approveButton, borrowedButton; //new JButton
+    private JButton techSearchStudentButton, apButton, approveButton, borrowedButton, studentSearchButton, studentSearchBackButton; //new JButton
     private JTextField userText,TechText, studentIDate, apName; //studentIDate, apName new
     private JPasswordField passwordText,techPassword;
     private JButton[] returnButton = new JButton[4];
-    private JTextArea studentDashboardArea, studentDashboardBasket, dashPanel, requestList, borrowedStudents; //request list new
-    private JScrollPane itemScroll, studentDashboardScroll, studentDashboardBasketScroll, requestScroll; //request Scroll new
+    private JTextArea studentDashboardArea, studentDashboardBasket, dashPanel, requestList, borrowedStudents, studentSearchArea; //request list new
+    private JScrollPane itemScroll, studentDashboardScroll, studentDashboardBasketScroll, requestScroll, studentSearchScroll; //request Scroll new
 
     //java.time for current time and date
     private LocalDate currentDateObj = LocalDate.now();
@@ -82,6 +82,7 @@ public class GUI extends JFrame{
         studentItemSearch = new JPanel();
         itemApproveP = new JPanel();
         borrowedPanel = new JPanel();
+        studentSearchPanel = new JPanel();
         cardLayout = new CardLayout();
 
         //text area convert to scroll pane
@@ -94,12 +95,15 @@ public class GUI extends JFrame{
         requestList = new JTextArea();
         requestScroll = new JScrollPane(requestList);
         borrowedStudents = new JTextArea();
+        studentSearchArea = new JTextArea();
+        studentSearchScroll = new JScrollPane(studentSearchArea);
 
         studentDashboardArea.setEditable(false);
         studentDashboardBasket.setEditable(false);
         dashPanel.setEditable(false);
         requestList.setEditable(false);
         borrowedStudents.setEditable(false);
+        studentSearchArea.setEditable(false);
 
         ButtonHandler BH = new ButtonHandler(); //assigns variable BH as a handler for variables of type JButton
         techHandler TH = new techHandler();
@@ -126,6 +130,9 @@ public class GUI extends JFrame{
         apButton = new JButton("Approvals");
         approveButton = new JButton("Approve");
         borrowedButton = new JButton("Borrowed Student");
+        techSearchStudentButton = new JButton("Search Student");
+        studentSearchButton = new JButton("Search.");
+        studentSearchBackButton = new JButton("Back");
 
         for (int i = 0; i < 4; i++){
             invReturn[i] = new JButton("Back");
@@ -136,7 +143,6 @@ public class GUI extends JFrame{
         studentISearchBack = new JButton("Go Back");
 
         TsubmitLogin = new JButton("Enter");
-        techStudentRequestButton = new JButton("Student Search");
         techBackButton = new JButton("Return to Main Menu");
 
         //studentDashboard buttons
@@ -172,10 +178,12 @@ public class GUI extends JFrame{
         iSearchBack[0].addActionListener(TH);
         iSearchBack[1].addActionListener(TH);
         iSearchBack[2].addActionListener(TH);
-        techStudentRequestButton.addActionListener(TH);
         apButton.addActionListener(TH);
         approveButton.addActionListener(TH);
         borrowedButton.addActionListener(TH);
+        techSearchStudentButton.addActionListener(TH);
+        studentSearchButton.addActionListener(TH);
+        studentSearchBackButton.addActionListener(TH);
 
         studentEnterItem.addActionListener(SH);
         studentISearchButton.addActionListener(SH);
@@ -218,6 +226,7 @@ public class GUI extends JFrame{
         frame.add(studentItemSearch, "studentItemSearch");
         frame.add(itemApproveP, "ApprovalPanel");
         frame.add(borrowedPanel, "borrowedPanel");
+        frame.add(studentSearchPanel, "studentSearchP");
         frame.setSize(1000,650);
         
         frame.setLocationRelativeTo(null);
@@ -240,6 +249,7 @@ public class GUI extends JFrame{
         invP();
         searchP();
         studentSearchP();
+        techStudentSearchP();
         //approvalP();
     }
 
@@ -377,12 +387,13 @@ public class GUI extends JFrame{
     private JButton itemDashButton = new JButton("Dashboard");
 
     public void techP(){ //panel after logging into tech
-        techPanel.setLayout(new GridLayout(6,1));
+        techPanel.setLayout(new GridLayout(7,1));
         techPanel.add(inventoryButton);
         techPanel.add(itemDashButton);
         techPanel.add(iSearch);
         techPanel.add(apButton);
         techPanel.add(borrowedButton);
+        techPanel.add(techSearchStudentButton);
         techPanel.add(techBackButton);
     }
 
@@ -438,6 +449,43 @@ public class GUI extends JFrame{
         itemSearch.add(enterItem);
         itemSearch.add(iInfo);
         itemSearch.add(iSearchBack[0]);
+    }
+
+    private JTextField searchStudentField;
+
+    public void techStudentSearchP(){
+        studentSearchPanel.setLayout(new GridLayout(5,2));
+        studentSearchPanel.add(new JLabel("Enter student name: "));
+        studentSearchPanel.add(searchStudentField = new JTextField());
+        studentSearchPanel.add(studentSearchButton);
+        studentSearchPanel.add(studentSearchScroll);
+        studentSearchPanel.add(studentSearchBackButton);
+    }
+
+    public void techStudentSearcher(){
+        boolean isRequestStudent = false;
+        ArrayList<Item> studentItems = new ArrayList<Item>();
+        int studentIndex = 0;
+        studentSearchArea.setText("Borrowed Items\tQuantity Borrowed\tDate Return\n");
+        for (int i = 0; i <= students.size(); i++){
+            for (int j = 0; j <= RQ.size(); j++){
+                if (searchStudentField.equals(RQ.get(j).getName())){
+                    isRequestStudent = true;
+                    studentIndex = j;
+                    searchStudentField.setText("");
+                    for (Item item : RQ.get(j).getItems()) {
+                        studentItems.add(item);
+                    }
+                }
+            }
+        }
+        if (isRequestStudent){
+            for (int i = 0; i <= studentItems.size(); i++){
+                studentSearchArea.append(studentItems.get(i).getName() + "\t" + studentItems.get(i).getQuantity()
+                + "\t" + studentItems.get(i).getDate() + "\n");
+            }
+        }
+
     }
 
     final JLabel iInfo = new JLabel("");
@@ -620,6 +668,7 @@ public class GUI extends JFrame{
     //JComboBox pending;
     final JLabel isApprove = new JLabel(""); //new
     static int n = 0;
+
     public void approvalP(){ //new
         ArrayList<String> IDRequest = new ArrayList<String>();
         
@@ -649,6 +698,7 @@ public class GUI extends JFrame{
         n++;
     }
 
+    //brother this is O(n^4)
     public void approveItem(){ //new
         
         for (int i = 0; i < students.size(); i++){
@@ -905,9 +955,6 @@ public class GUI extends JFrame{
             if (e.getActionCommand().equals("Go Back")){
                 cardLayout.show(frame.getContentPane(), "techPanel");
             }
-            if (e.getActionCommand().equals("Student Search")){
-                //search for students
-            }
             if (e.getActionCommand().equals("Approvals")){
                 approvalP();
                 cardLayout.show(frame.getContentPane(), "ApprovalPanel");
@@ -918,6 +965,16 @@ public class GUI extends JFrame{
             if (e.getActionCommand().equals("Borrowed Student")){
                 borrowedP();
                 cardLayout.show(frame.getContentPane(), "borrowedPanel");
+            }
+            if (e.getActionCommand().equals("Search.")){
+                techStudentSearcher();
+            }
+            if (e.getActionCommand().equals("Back")){
+                cardLayout.show(frame.getContentPane(), "techPanel");
+                studentSearchArea.setText("");
+            }
+            if (e.getActionCommand().equals("Search Student")){
+                cardLayout.show(frame.getContentPane(), "studentSearchP");
             }
 
         }

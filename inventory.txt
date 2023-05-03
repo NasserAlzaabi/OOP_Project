@@ -1,6 +1,3 @@
-diode	d133	8	10	y	0
-telescope	tele-321	486	2	n	02-05-2023
-capacitor	c4893	3	25	y	0
-keyboard	2018	50	7	n	23-04-2024
-laptop	2021	1200	3	n	01-01-2027
-arduinoBoard	2017	20	12	n	30-02-2030
+diode	d1111	4	30	y	0
+capacitor	c1111	7	20	y	0
+laptop	asus2020	5000	3	n	20-10-2040

@@ -3,6 +3,10 @@ package OOP_Project;
 import java.util.ArrayList;
 
 public class Request {
+
+	String Name, ID, Date;
+	ArrayList<Item> items = new ArrayList<Item>();
+	
 	public Request(String name, String iD, String date, ArrayList<Item> items) {
 		Name = name;
 		ID = iD;
@@ -15,8 +19,6 @@ public class Request {
 	public void setDate(String date) {
 		Date = date;
 	}
-	String Name, ID, Date;
-	ArrayList<Item> items = new ArrayList<Item>();
 
 	public String getName() {
 		return Name;
