@@ -1,7 +1,5 @@
 zayed	Phone Number: 111
 Name 	 Quantity
-diode	4	0
-diode	10	0
-laptop	21	20-10-2040
+diode	7	0
 
-03-05-2023	10:06:53
+03-05-2023	11:25:44

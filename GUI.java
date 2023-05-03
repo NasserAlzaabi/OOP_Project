@@ -405,7 +405,6 @@ public class GUI extends JFrame{
             if (!students.get(i).getItems().isEmpty()){
                 borrowedStudents.append(students.get(i).getName());
                 borrowedStudents.append(students.get(i).getID());
-                borrowedStudents.append(students.get(i).getName());
             }
         }
 
@@ -454,7 +453,7 @@ public class GUI extends JFrame{
     private JTextField searchStudentField;
 
     public void techStudentSearchP(){
-        studentSearchPanel.setLayout(new GridLayout(5,2));
+        studentSearchPanel.setLayout(new GridLayout(3,2));
         studentSearchPanel.add(new JLabel("Enter student name: "));
         studentSearchPanel.add(searchStudentField = new JTextField());
         studentSearchPanel.add(studentSearchButton);
@@ -465,28 +464,31 @@ public class GUI extends JFrame{
     public void techStudentSearcher(){
         boolean isRequestStudent = false;
         ArrayList<Item> studentItems = new ArrayList<Item>();
-        int studentIndex = 0;
+        int studentIndex = -1; 
         studentSearchArea.setText("Borrowed Items\tQuantity Borrowed\tDate Return\n");
-        for (int i = 0; i <= students.size(); i++){
-            for (int j = 0; j <= RQ.size(); j++){
-                if (searchStudentField.equals(RQ.get(j).getName())){
+        for (int i = 0; i < students.size(); i++){ 
+            for (int j = 0; j < RQ.size(); j++){ 
+                if (searchStudentField.getText().equals(RQ.get(j).getName())){ 
                     isRequestStudent = true;
                     studentIndex = j;
                     searchStudentField.setText("");
-                    for (Item item : RQ.get(j).getItems()) {
-                        studentItems.add(item);
-                    }
                 }
             }
         }
         if (isRequestStudent){
-            for (int i = 0; i <= studentItems.size(); i++){
+            for (Item item : RQ.get(studentIndex).getItems()) {
+                studentItems.add(item);
+            }
+            for (int i = 0; i < studentItems.size(); i++){ 
                 studentSearchArea.append(studentItems.get(i).getName() + "\t" + studentItems.get(i).getQuantity()
                 + "\t" + studentItems.get(i).getDate() + "\n");
             }
         }
-
+        else{
+            studentSearchArea.append("no items");
+        }
     }
+    
 
     final JLabel iInfo = new JLabel("");
     public void searchItem(){
@@ -679,11 +681,11 @@ public class GUI extends JFrame{
             if (students.get(i).isRequest())
                 IDRequest.add(students.get(i).getID());
         }
+
         for (int j = 0; j < RQ.size(); j++){
-    
             requestList.append(RQ.get(j).getName() + "\t" + RQ.get(j).getDate() + "\t");
-            for (int n = 0; n < RQ.get(j).getItems().size(); n++)
-                requestList.append(RQ.get(j).getItems().get(n).getName());
+            for (int a = 0; a < RQ.get(j).getItems().size(); a++) // changed n to a because idk what nasser did
+                requestList.append(RQ.get(j).getItems().get(a).getName());
             requestList.append("\n");
         }
         
