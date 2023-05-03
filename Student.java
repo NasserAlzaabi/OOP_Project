@@ -5,6 +5,15 @@ import java.util.ArrayList;
 class Student extends User{
 	
 	String phone_Number;
+	public boolean isApproved() {
+		return isApproved;
+	}
+
+	public void setApproved(boolean isApproved) {
+		this.isApproved = isApproved;
+	}
+
+	boolean isApproved = false;
 	ArrayList<Item> items = new ArrayList<Item>();
 	boolean request = false; // new variable
 

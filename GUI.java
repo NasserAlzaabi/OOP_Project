@@ -234,6 +234,8 @@ public class GUI extends JFrame{
 
         
         getInventoryFromFile();
+        readStudentInfo();
+        System.out.println(students);
         frame.setVisible(true);
         
         techOrStu();
@@ -400,11 +402,10 @@ public class GUI extends JFrame{
     public void borrowedP(){ //new
         borrowedPanel.setLayout(new GridLayout(2,2));
         borrowedStudents.setText("");
-        borrowedStudents.append("Name \t ID \t Due Date");
+        borrowedStudents.append("Name \t ID \t Due Date\n");
         for (int i = 0; i < students.size(); i++){
-            if (!students.get(i).getItems().isEmpty()){
-                borrowedStudents.append(students.get(i).getName());
-                borrowedStudents.append(students.get(i).getID());
+            if (students.get(i).isApproved()){
+                borrowedStudents.append(students.get(i).getName() + "\t" + students.get(i).getID() + "\t07-07-2023\n"); //add student date
             }
         }
 
@@ -640,6 +641,8 @@ public class GUI extends JFrame{
         }
     }
     //here
+
+    Item tempB = new Item();
     public void sendItemRequest(){ //new method that appends to a file
         try{
             String fileName = loggedStudent.getID() + "Request.txt";
@@ -648,7 +651,9 @@ public class GUI extends JFrame{
             out.append(loggedStudent.getName() + "\t" + "Phone Number: " + loggedStudent.getPhoneNumber() + "\n" 
             + basketItems + "\n" + currentDate + "\t" + currentTime + "\n");
             out.close();
-            RQ.add(new Request(loggedStudent.getName(), loggedStudent.getID(), dateStudent, basket));
+            System.out.println(basket);
+            Request tempR = new Request(loggedStudent.getName(), loggedStudent.getID(), dateStudent, basket);
+            RQ.add(tempR);
             for (int i = 0; i < students.size(); i++){ //sets boolean request to true if a students requests
                 if (loggedStudent.getID() == students.get(i).getID()){
                     students.get(i).setRequest(true);
@@ -661,6 +666,7 @@ public class GUI extends JFrame{
             for (int j = 0; j < inventory.size(); j++){
                 if (basket.get(i).getName().equals(inventory.get(j).getName())){
                     inventory.get(j).setBorrowedQuantity(basket.get(i).getQuantity());
+
                 }
             }
         }
@@ -703,24 +709,33 @@ public class GUI extends JFrame{
     //brother this is O(n^4)
     public void approveItem(){ //new
         
-        for (int i = 0; i < students.size(); i++){
-            if (students.get(i).isRequest()){
-                for (int j = 0; j < RQ.size(); j++){
-                    if (students.get(i).getName().equals(RQ.get(j).getName())){ //the inside of this code is not executed
-                        isApprove.setText("Approved " + apName.getText() + "'s request");
-                        students.get(i).setRequest(false);
-                        students.get(i).setItems(RQ.get(j).getItems());
+        for (int i = 0; i < RQ.size(); i++){
+            System.out.println("is request i");
+                for (int j = 0; j < students.size(); j++){
+                    System.out.println("studentfor");
+                    if (students.get(j).getName().equals(RQ.get(i).getName())){ //the inside of this code is not executed
+                        if (apName.getText().equals(students.get(j).getName()))
+                            isApprove.setText("Approved " + apName.getText() + "'s request");
+                        students.get(j).setRequest(false);
+                        students.get(j).setApproved(true);
+                        students.get(j).setItems(RQ.get(i).getItems());
                         for (int q = 0; q < inventory.size(); q++){
-                            for (int a = 0; a < RQ.get(j).getItems().size(); a++){
-                                if (inventory.get(q).getName().equals(RQ.get(j).getItems().get(a).getName())){ 
+                            for (int a = 0; a < RQ.get(i).getItems().size(); a++){ //doesnt go in here
+                                System.out.println("test");
+                                if (inventory.get(q).getName().equals(RQ.get(i).getItems().get(a).getName())){ 
                                     inventory.get(q).setQuantity(inventory.get(q).getQuantity() - inventory.get(q).getBorrowedQuantity());
+                                    System.out.println("item same? aq");
                                 }
+                                System.out.println("RQ item loop");
                             }
+                            System.out.println("inventoryLOOP");
                         }
+                        System.out.println("same name? j");
                     }
 
-                }
+                
             }
+            System.out.println("is approve i");
         }
     }
 
@@ -773,6 +788,16 @@ public class GUI extends JFrame{
             }
     }
 
+    public void readStudentInfo(){
+        try{
+            Scanner fin = new Scanner (new File("studentInfo.txt"));
+            while(fin.hasNextLine()){
+                String line = fin.nextLine();
+                String[] data = line.split(" ");
+                createNewStudent(data[0], data[1], data[2], data[3]);
+            }
+        } catch (FileNotFoundException e){ e.printStackTrace(); }
+    }
 
     //its in the name
     public void createNewStudent(String newID, String newName, String newPassword, String newPhoneNumber){

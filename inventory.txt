@@ -1,3 +1,10 @@
-diode	d1111	4	30	y	0
-capacitor	c1111	7	20	y	0
-laptop	asus2020	5000	3	n	20-10-2040
+diode	d1212	10	20	y	0
+capacitor	c1112	13	30	y	0
+button	b6661	2	27	y	0
+keyboard	k3671	150	10	n	56-37-4224
+resistor	r5472	9	15	y	0
+laptop	lap4562	1500	20	n	46-14-5124
+breadboard	bb1231	46	4	y	0
+arduino	ar131	222	3	y	0
+jumpers	j4567	45	0	y	0
+pc	pc346	2000	20	n	11-11-2025
