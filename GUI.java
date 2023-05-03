@@ -564,11 +564,11 @@ public class GUI extends JFrame{
                 basket.add(myItem);
                 dateStudent = studentIDate.getText();
                 studentDashboardBasket.append(studentIName.getText() + "\t" + studentIQuantity.getText() + "\t" + studentIDate.getText() + "\n");
-                for (int n = 0; n < inventory.size();n++)
-                {
-                    if (inventory.get(n).getName().equals(studentIName.getText()))
-                        inventory.get(n).setDate(studentIDate.getText());
-                }
+                // for (int n = 0; n < inventory.size();n++)
+                // {
+                //     if (inventory.get(n).getName().equals(studentIName.getText()))
+                //         inventory.get(n).setDate(studentIDate.getText());
+                // }
                 studentIName.setText("");
                 studentIQuantity.setText("");
                 studentIDate.setText("");
@@ -791,6 +791,7 @@ public class GUI extends JFrame{
                 cardLayout.show(frame.getContentPane(), "SignupPanel");
             if (e.getActionCommand().equals("Return")){
                 loggedStudent = new Student(); //resets logged student when loggin out
+                basket.clear();
                 cardLayout.show(frame.getContentPane(), "MainPanel");
             }      
             if (e.getActionCommand().equals("Return to Selection"))
